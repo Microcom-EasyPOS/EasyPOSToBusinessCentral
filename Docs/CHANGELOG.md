@@ -226,7 +226,7 @@ Data Size: 194,908 bytes
 
 **Ingen nye dependencies tilføjet**
 - Firebird SQL version: Uændret
-- Delphi version: 12.3 Athens
+- Delphi version: 13.1
 - Business Central API: Uændret
 
 ---

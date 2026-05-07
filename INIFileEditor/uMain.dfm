@@ -19,20 +19,17 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnShow = FormShow
   TextHeight = 15
-  object RzPageControl1: TRzPageControl
+  object PageControl1: TPageControl
     Left = 0
     Top = 0
     Width = 1371
     Height = 715
-    Hint = ''
     ActivePage = tsProgram
     Align = alClient
-    TabIndex = 0
     TabOrder = 0
-    FixedDimension = 21
-    object tsProgram: TRzTabSheet
+    object tsProgram: TTabSheet
       Caption = 'Program'
-      object Label1: TRzLabel
+      object Label1: TLabel
         Left = 16
         Top = 28
         Width = 751
@@ -42,42 +39,42 @@ object frmMain: TfrmMain
           ' between 2 hours (both included like 2204) or how many minutes b' +
           'etween runs'
       end
-      object Label2: TRzLabel
+      object Label2: TLabel
         Left = 16
         Top = 105
         Width = 135
         Height = 15
         Caption = 'Select folder to place logs'
       end
-      object RzLabel1: TRzLabel
+      object lblDatabase: TLabel
         Left = 16
         Top = 183
         Width = 96
         Height = 15
         Caption = 'EasyPOS Database'
       end
-      object RzLabel2: TRzLabel
+      object lblUser: TLabel
         Left = 16
         Top = 260
         Width = 65
         Height = 15
         Caption = 'Firebird user'
       end
-      object RzLabel6: TRzLabel
+      object lblPassword: TLabel
         Left = 16
         Top = 338
         Width = 93
         Height = 15
         Caption = 'Firebird password'
       end
-      object RzLabel7: TRzLabel
+      object lblDepartment: TLabel
         Left = 16
         Top = 415
         Width = 110
         Height = 15
         Caption = 'EasyPOS department'
       end
-      object RzLabel8: TRzLabel
+      object lblMachine: TLabel
         Left = 16
         Top = 493
         Width = 94
@@ -91,83 +88,78 @@ object frmMain: TfrmMain
         Height = 15
         Caption = 'lblLastruntime'
       end
-      object edPassword: TRzEdit
+      object edPassword: TEdit
         Left = 16
         Top = 355
         Width = 200
         Height = 23
-        Text = 'Set Firebird password'
         PasswordChar = '*'
         TabOrder = 5
+        Text = 'Set Firebird password'
       end
-      object edDepartment: TRzEdit
+      object edDepartment: TEdit
         Left = 16
         Top = 432
         Width = 200
         Height = 23
-        Text = 'Set EasyPOS Department '
         TabOrder = 6
+        Text = 'Set EasyPOS Department '
       end
-      object edMachine: TRzEdit
+      object edMachine: TEdit
         Left = 16
         Top = 509
         Width = 200
         Height = 23
-        Text = 'Set EasyPOS Machine'
         TabOrder = 7
+        Text = 'Set EasyPOS Machine'
       end
-      object edTimer: TRzNumericEdit
+      object edTimer: TEdit
         Left = 16
         Top = 47
         Width = 65
         Height = 23
         Hint = 'Enter minutes between service will check and do export'
         TabOrder = 0
-        DisplayFormat = ',0;(,0)'
       end
-      object edLogFolder: TRzEdit
+      object edLogFolder: TEdit
         Left = 16
         Top = 124
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 2
         TextHint = 'Select folder where logs are stored'
       end
-      object edDatabase: TRzEdit
+      object edDatabase: TEdit
         Left = 16
         Top = 201
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 3
         TextHint = 'Set EasyPOS Connection string'
       end
-      object edUser: TRzEdit
+      object edUser: TEdit
         Left = 16
         Top = 278
         Width = 200
         Height = 23
-        Text = ''
         TabOrder = 4
         TextHint = 'Set Firebird user'
       end
-      object cbOnlyTest: TRzCheckBox
+      object cbOnlyTest: TCheckBox
         Left = 16
         Top = 568
         Width = 357
         Height = 19
-        AutoSizeWidth = 357
         Caption = 
           'Only run as test (noting will be syncronized to Business Central' +
           ')'
-        State = cbUnchecked
         TabOrder = 8
       end
-      object btnSelectFolder: TRzBitBtn
+      object btnSelectFolder: TBitBtn
         Left = 696
         Top = 122
         Width = 25
+        Height = 25
         Caption = '*'
         TabOrder = 9
         TabStop = False
@@ -181,373 +173,385 @@ object frmMain: TfrmMain
         Caption = 'K'#248'r i stedet hvert angivet minut'
         TabOrder = 1
       end
+      object btnTestDB: TButton
+        Left = 16
+        Top = 620
+        Width = 170
+        Height = 30
+        Caption = 'Test DB Connection'
+        TabOrder = 10
+        OnClick = btnTestDBClick
+      end
     end
-    object TabSheet1: TRzTabSheet
+    object TabSheet1: TTabSheet
       Caption = 'Business Central'
-      object RzLabel3: TRzLabel
+      object lblBaseURL: TLabel
         Left = 24
         Top = 15
         Width = 48
         Height = 15
         Caption = 'Base URL'
       end
-      object RzLabel4: TRzLabel
+      object lblPort: TLabel
         Left = 24
         Top = 84
         Width = 97
         Height = 15
         Caption = 'Port (0 is disabled)'
       end
-      object RzLabel5: TRzLabel
+      object lblTenant: TLabel
         Left = 24
         Top = 153
         Width = 36
         Height = 15
         Caption = 'Tenant'
       end
-      object RzLabel9: TRzLabel
+      object lblClientID: TLabel
         Left = 24
         Top = 292
         Width = 45
         Height = 15
         Caption = 'Client ID'
       end
-      object RzLabel10: TRzLabel
+      object lblClientPassword: TLabel
         Left = 24
         Top = 361
         Width = 84
         Height = 15
         Caption = 'Client Password'
       end
-      object RzLabel11: TRzLabel
+      object lblActiveCompany: TLabel
         Left = 24
         Top = 430
         Width = 88
         Height = 15
         Caption = 'Active Company'
       end
-      object RzLabel41: TRzLabel
+      object lblEnvironment: TLabel
         Left = 24
         Top = 222
         Width = 68
         Height = 15
         Caption = 'Environment'
       end
-      object RzLabel43: TRzLabel
+      object lblCustomer: TLabel
         Left = 24
         Top = 499
         Width = 52
         Height = 15
         Caption = 'Customer'
       end
-      object edBCBaseURL: TRzEdit
+      object edBCBaseURL: TEdit
         Left = 24
         Top = 40
         Width = 665
         Height = 23
-        Text = 'Set Business Central baseURL'
         TabOrder = 0
+        Text = 'Set Business Central baseURL'
       end
-      object edBCPOrt: TRzNumericEdit
+      object edBCPOrt: TEdit
         Left = 24
         Top = 107
         Width = 65
         Height = 23
         TabOrder = 1
-        AllowScientificNotation = False
-        DisplayFormat = ',0;(,0)'
       end
-      object edBCCompanyURL: TRzEdit
+      object edBCCompanyURL: TEdit
         Left = 24
         Top = 175
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 2
         TextHint = 'Set Business Central tenant'
       end
-      object edBCUser: TRzEdit
+      object edBCUser: TEdit
         Left = 24
         Top = 314
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 4
         TextHint = 'Set client ID'
       end
-      object edBCPassword: TRzEdit
+      object edBCPassword: TEdit
         Left = 24
         Top = 382
         Width = 665
         Height = 23
-        Text = 'Set client password'
         TabOrder = 5
+        Text = 'Set client password'
       end
-      object edBCActiveCompany: TRzEdit
+      object edBCActiveCompany: TEdit
         Left = 24
         Top = 450
         Width = 665
         Height = 23
-        Text = 'Set active company in Business Central'
         TabOrder = 6
+        Text = 'Set active company in Business Central'
       end
-      object edEnvironment: TRzEdit
+      object edEnvironment: TEdit
         Left = 24
         Top = 243
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 3
         TextHint = 'Set Business Central Environment'
       end
-      object edBusinessCentralKunde: TRzEdit
+      object edBusinessCentralKunde: TEdit
         Left = 24
         Top = 518
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 7
         TextHint = 'Set the name of the customer'
       end
+      object btnTestBC: TButton
+        Left = 24
+        Top = 570
+        Width = 200
+        Height = 30
+        Caption = 'Test BC Connection'
+        TabOrder = 8
+        OnClick = btnTestBCClick
+      end
+      object lblBCFullURL: TLabel
+        Left = 24
+        Top = 620
+        Width = 330
+        Height = 15
+        Caption = 'Paste a full Business Central URL here to auto-fill fields above:'
+      end
+      object edBCFullURL: TEdit
+        Left = 24
+        Top = 639
+        Width = 565
+        Height = 23
+        TabOrder = 9
+        TextHint = 'https://api.businesscentral.dynamics.com/v2.0/{tenant}/{env}/ODataV4/...'
+      end
+      object btnParseURL: TButton
+        Left = 600
+        Top = 637
+        Width = 89
+        Height = 27
+        Caption = 'Parse URL'
+        TabOrder = 10
+        OnClick = btnParseURLClick
+      end
     end
-    object TabSheet2: TRzTabSheet
+    object TabSheet2: TTabSheet
       Caption = 'Mail'
-      object RzLabel12: TRzLabel
+      object lblFromName: TLabel
         Left = 32
         Top = 23
         Width = 61
         Height = 15
         Caption = 'From name'
       end
-      object RzLabel13: TRzLabel
+      object lblRecipientMail: TLabel
         Left = 32
         Top = 268
         Width = 75
         Height = 15
         Caption = 'Recipient mail'
       end
-      object RzLabel14: TRzLabel
+      object lblSubject: TLabel
         Left = 32
         Top = 329
         Width = 39
         Height = 15
         Caption = 'Subject'
       end
-      object RzLabel15: TRzLabel
+      object lblHost: TLabel
         Left = 32
         Top = 391
         Width = 25
         Height = 15
         Caption = 'Host'
       end
-      object RzLabel16: TRzLabel
+      object lblPort2: TLabel
         Left = 32
         Top = 452
         Width = 22
         Height = 15
         Caption = 'Port'
       end
-      object RzLabel17: TRzLabel
+      object lblUsername: TLabel
         Left = 32
         Top = 513
         Width = 53
         Height = 15
         Caption = 'Username'
       end
-      object RzLabel18: TRzLabel
+      object lblFromMail: TLabel
         Left = 32
         Top = 84
         Width = 54
         Height = 15
         Caption = 'From mail'
       end
-      object RzLabel19: TRzLabel
+      object lblReplyToName: TLabel
         Left = 32
         Top = 145
         Width = 76
         Height = 15
         Caption = 'Reply to name'
       end
-      object RzLabel20: TRzLabel
+      object lblReplyToMail: TLabel
         Left = 32
         Top = 207
         Width = 69
         Height = 15
         Caption = 'Reply to mail'
       end
-      object RzLabel21: TRzLabel
+      object lblMailPassword: TLabel
         Left = 32
         Top = 575
         Width = 50
         Height = 15
         Caption = 'Password'
       end
-      object edMailSenderName: TRzEdit
+      object edMailSenderName: TEdit
         Left = 32
         Top = 44
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 0
         TextHint = 'Set the name of the sender when an errormessage is send'
       end
-      object edMailSenderMail: TRzEdit
+      object edMailSenderMail: TEdit
         Left = 32
         Top = 105
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 1
         TextHint = 'Set the mail from which an errormessage is send'
       end
-      object edMailReplyToName: TRzEdit
+      object edMailReplyToName: TEdit
         Left = 32
         Top = 166
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 2
         TextHint = 'Set the reply to name when an errormessage is send'
       end
-      object edMailReplyToMail: TRzEdit
+      object edMailReplyToMail: TEdit
         Left = 32
         Top = 228
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 3
         TextHint = 'Set the reply to email when an errormessage is send'
       end
-      object edMailReciever: TRzEdit
+      object edMailReciever: TEdit
         Left = 32
         Top = 289
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 4
         TextHint = 'Set recipients mail (divided by ; if more than one)'
       end
-      object edMailSubject: TRzEdit
+      object edMailSubject: TEdit
         Left = 32
         Top = 350
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 5
         TextHint = 'Set the subject of the mail'
       end
-      object edMailSMTPHost: TRzEdit
+      object edMailSMTPHost: TEdit
         Left = 32
         Top = 412
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 6
         TextHint = 'Set the SMTP host'
       end
-      object edMailSMTPPort: TRzNumericEdit
+      object edMailSMTPPort: TEdit
         Left = 32
         Top = 473
         Width = 65
         Height = 23
         TabOrder = 7
-        DisplayFormat = ',0;(,0)'
       end
-      object edMailSMTPUSername: TRzEdit
+      object edMailSMTPUSername: TEdit
         Left = 32
         Top = 534
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 8
         TextHint = 'Set the SMTP Username'
       end
-      object edMailSMTPPassword: TRzEdit
+      object edMailSMTPPassword: TEdit
         Left = 32
         Top = 596
         Width = 665
         Height = 23
-        Text = ''
         TabOrder = 9
         TextHint = 'Set the SMTP password'
       end
-      object cbUseTLS: TRzCheckBox
+      object cbUseTLS: TCheckBox
         Left = 120
         Top = 475
         Width = 60
         Height = 17
-        AutoSizeWidth = 60
         Caption = 'Use TLS'
-        State = cbUnchecked
         TabOrder = 10
       end
     end
-    object TabSheet3: TRzTabSheet
+    object TabSheet3: TTabSheet
       Caption = 'Syncronize'
-      object cbSyncItems: TRzCheckBox
+      object cbSyncItems: TCheckBox
         Left = 16
         Top = 32
-        Width = 108
+        Width = 200
         Height = 17
-        AutoSizeWidth = 108
         Caption = 'Syncronize items'
-        State = cbUnchecked
         TabOrder = 0
       end
-      object cbSyncFinancialRecords: TRzCheckBox
+      object cbSyncFinancialRecords: TCheckBox
         Left = 16
         Top = 75
-        Width = 166
+        Width = 200
         Height = 17
-        AutoSizeWidth = 166
         Caption = 'Syncronize financial records'
-        State = cbUnchecked
         TabOrder = 1
       end
-      object cbSyncSalesTrans: TRzCheckBox
+      object cbSyncSalesTrans: TCheckBox
         Left = 16
         Top = 119
-        Width = 171
+        Width = 200
         Height = 17
-        AutoSizeWidth = 171
         Caption = 'Syncronize sales transactions'
-        State = cbUnchecked
         TabOrder = 2
       end
-      object cbSyncMovements: TRzCheckBox
+      object cbSyncMovements: TCheckBox
         Left = 16
         Top = 162
-        Width = 204
+        Width = 250
         Height = 17
-        AutoSizeWidth = 204
         Caption = 'Syncronize movement transactions'
-        State = cbUnchecked
         TabOrder = 3
       end
-      object cbSyncStockRegulations: TRzCheckBox
+      object cbSyncStockRegulations: TCheckBox
         Left = 16
         Top = 206
-        Width = 231
+        Width = 280
         Height = 17
-        AutoSizeWidth = 231
         Caption = 'Syncronize stock regulation transactions'
-        State = cbUnchecked
         TabOrder = 4
       end
-      object cbSyncCostpriceToEasyPOS: TRzCheckBox
+      object cbSyncCostpriceToEasyPOS: TCheckBox
         Left = 16
         Top = 250
-        Width = 312
+        Width = 350
         Height = 17
-        AutoSizeWidth = 312
         Caption = 'Syncronize costprices from Business Central to EasyPOS'
-        State = cbUnchecked
         TabOrder = 5
       end
     end
-    object tsItems: TRzTabSheet
+    object tsItems: TTabSheet
       Caption = 'Items'
-      object RzLabel22: TRzLabel
+      object lblItemsDays: TLabel
         Left = 24
         Top = 34
         Width = 335
@@ -556,68 +560,64 @@ object frmMain: TfrmMain
           'Days to look back if routine has never run (no value in Last Run' +
           ')'
       end
-      object RzLabel23: TRzLabel
+      object lblItemsLastRun: TLabel
         Left = 24
         Top = 160
         Width = 42
         Height = 15
         Caption = 'Last run'
       end
-      object RzLabel24: TRzLabel
+      object lblItemsDepartment: TLabel
         Left = 24
         Top = 97
         Width = 131
         Height = 15
         Caption = 'Department to limit SQL '
       end
-      object RzLabel25: TRzLabel
+      object lblItemsLastTry: TLabel
         Left = 24
         Top = 223
         Width = 73
         Height = 15
         Caption = 'Last try to run'
       end
-      object edItemsDAys: TRzNumericEdit
+      object edItemsDAys: TEdit
         Left = 24
         Top = 55
         Width = 65
         Height = 23
         Hint = 'Enter minutes between service will check and do export'
         TabOrder = 0
-        DisplayFormat = ',0;(,0)'
       end
-      object edItemsLastRun: TRzEdit
+      object edItemsLastRun: TEdit
         Left = 24
         Top = 179
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 1
       end
-      object edItemsDeparetment: TRzEdit
+      object edItemsDeparetment: TEdit
         Left = 24
         Top = 117
         Width = 65
         Height = 23
-        Text = ''
         TabOrder = 2
       end
-      object edItemsLastTry: TRzEdit
+      object edItemsLastTry: TEdit
         Left = 24
         Top = 242
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 3
       end
     end
-    object TabSheet4: TRzTabSheet
+    object TabSheet4: TTabSheet
       Caption = 'Financial records'
-      object RzLabel26: TRzLabel
+      object lblFinDays: TLabel
         Left = 32
         Top = 42
         Width = 335
@@ -626,52 +626,49 @@ object frmMain: TfrmMain
           'Days to look back if routine has never run (no value in Last Run' +
           ')'
       end
-      object RzLabel27: TRzLabel
+      object lblFinLastRun: TLabel
         Left = 32
         Top = 168
         Width = 42
         Height = 15
         Caption = 'Last run'
       end
-      object RzLabel29: TRzLabel
+      object lblFinLastTry: TLabel
         Left = 32
         Top = 231
         Width = 73
         Height = 15
         Caption = 'Last try to run'
       end
-      object edFinancialRecordsDAys: TRzNumericEdit
+      object edFinancialRecordsDAys: TEdit
         Left = 32
         Top = 63
         Width = 65
         Height = 23
         TabOrder = 0
-        DisplayFormat = ',0;(,0)'
       end
-      object edFinancialRecordsLastRun: TRzEdit
+      object edFinancialRecordsLastRun: TEdit
         Left = 32
         Top = 187
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 1
       end
-      object edFinancialRecordsLastTry: TRzEdit
+      object edFinancialRecordsLastTry: TEdit
         Left = 32
         Top = 250
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 2
       end
     end
-    object TabSheet7: TRzTabSheet
+    object TabSheet7: TTabSheet
       Caption = 'Sales transaction'
-      object RzLabel32: TRzLabel
+      object lblSalesDays: TLabel
         Left = 32
         Top = 42
         Width = 335
@@ -680,106 +677,49 @@ object frmMain: TfrmMain
           'Days to look back if routine has never run (no value in Last Run' +
           ')'
       end
-      object RzLabel33: TRzLabel
+      object lblSalesLastTry: TLabel
         Left = 32
         Top = 231
         Width = 73
         Height = 15
         Caption = 'Last try to run'
       end
-      object RzLabel34: TRzLabel
+      object lblSalesLastRun: TLabel
         Left = 32
         Top = 168
         Width = 42
         Height = 15
         Caption = 'Last run'
       end
-      object RzTabSheet1: TRzTabSheet
-        Caption = 'Financial records'
-        object RzLabel28: TRzLabel
-          Left = 32
-          Top = 42
-          Width = 335
-          Height = 15
-          Caption = 
-            'Days to look back if routine has never run (no value in Last Run' +
-            ')'
-        end
-        object RzLabel30: TRzLabel
-          Left = 32
-          Top = 168
-          Width = 42
-          Height = 15
-          Caption = 'Last run'
-        end
-        object RzLabel31: TRzLabel
-          Left = 32
-          Top = 231
-          Width = 73
-          Height = 15
-          Caption = 'Last try to run'
-        end
-        object RzNumericEdit1: TRzNumericEdit
-          Left = 32
-          Top = 63
-          Width = 65
-          Height = 23
-          TabOrder = 0
-          DisplayFormat = ',0;(,0)'
-        end
-        object RzEdit1: TRzEdit
-          Left = 32
-          Top = 187
-          Width = 665
-          Height = 23
-          Text = ''
-          Enabled = False
-          ReadOnly = True
-          TabOrder = 1
-        end
-        object RzEdit2: TRzEdit
-          Left = 32
-          Top = 250
-          Width = 665
-          Height = 23
-          Text = ''
-          Enabled = False
-          ReadOnly = True
-          TabOrder = 2
-        end
-      end
-      object edSalesTransactionsDays: TRzNumericEdit
+      object edSalesTransactionsDays: TEdit
         Left = 32
         Top = 63
         Width = 65
         Height = 23
-        TabOrder = 1
-        DisplayFormat = ',0;(,0)'
+        TabOrder = 0
       end
-      object edSalesTransactionsLastRun: TRzEdit
+      object edSalesTransactionsLastRun: TEdit
         Left = 32
         Top = 187
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
-        TabOrder = 2
+        TabOrder = 1
       end
-      object edSalesTransactionsLastTry: TRzEdit
+      object edSalesTransactionsLastTry: TEdit
         Left = 32
         Top = 255
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
-        TabOrder = 3
+        TabOrder = 2
       end
     end
-    object TabSheet8: TRzTabSheet
+    object TabSheet8: TTabSheet
       Caption = 'Movements transactions'
-      object RzLabel35: TRzLabel
+      object lblMovDays: TLabel
         Left = 32
         Top = 42
         Width = 335
@@ -788,52 +728,49 @@ object frmMain: TfrmMain
           'Days to look back if routine has never run (no value in Last Run' +
           ')'
       end
-      object RzLabel36: TRzLabel
+      object lblMovLastTry: TLabel
         Left = 32
         Top = 231
         Width = 73
         Height = 15
         Caption = 'Last try to run'
       end
-      object RzLabel37: TRzLabel
+      object lblMovLastRun: TLabel
         Left = 32
         Top = 168
         Width = 42
         Height = 15
         Caption = 'Last run'
       end
-      object edMovementsTransactionsDays: TRzNumericEdit
+      object edMovementsTransactionsDays: TEdit
         Left = 32
         Top = 63
         Width = 65
         Height = 23
         TabOrder = 0
-        DisplayFormat = ',0;(,0)'
       end
-      object edMovementTransactionsLastRun: TRzEdit
+      object edMovementTransactionsLastRun: TEdit
         Left = 32
         Top = 187
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 1
       end
-      object edMovementTransactionsLastTry: TRzEdit
+      object edMovementTransactionsLastTry: TEdit
         Left = 32
         Top = 250
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 2
       end
     end
-    object TabSheet9: TRzTabSheet
+    object TabSheet9: TTabSheet
       Caption = 'Stock regulation transations'
-      object RzLabel38: TRzLabel
+      object lblStockDays: TLabel
         Left = 32
         Top = 42
         Width = 335
@@ -842,72 +779,68 @@ object frmMain: TfrmMain
           'Days to look back if routine has never run (no value in Last Run' +
           ')'
       end
-      object RzLabel39: TRzLabel
+      object lblStockLastTry: TLabel
         Left = 32
         Top = 231
         Width = 73
         Height = 15
         Caption = 'Last try to run'
       end
-      object RzLabel40: TRzLabel
+      object lblStockLastRun: TLabel
         Left = 32
         Top = 168
         Width = 42
         Height = 15
         Caption = 'Last run'
       end
-      object edStockRegulationTransactionsDays: TRzNumericEdit
+      object edStockRegulationTransactionsDays: TEdit
         Left = 32
         Top = 63
         Width = 65
         Height = 23
         TabOrder = 0
-        DisplayFormat = ',0;(,0)'
       end
-      object edStockRegulationTransactionsLastRun: TRzEdit
+      object edStockRegulationTransactionsLastRun: TEdit
         Left = 32
         Top = 187
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 1
       end
-      object edStockRegulationTransactionsLastTry: TRzEdit
+      object edStockRegulationTransactionsLastTry: TEdit
         Left = 32
         Top = 250
         Width = 665
         Height = 23
-        Text = ''
         Enabled = False
         ReadOnly = True
         TabOrder = 2
       end
     end
-    object TabSheet10: TRzTabSheet
+    object TabSheet10: TTabSheet
       Caption = 'Costprice from Business Central'
-      object RzLabel42: TRzLabel
+      object lblCostpriceItems: TLabel
         Left = 40
         Top = 50
         Width = 257
         Height = 15
         Caption = 'How many items should be handled in one cycle'
       end
-      object edNumberofUtemsToUpdateCostprice: TRzNumericEdit
+      object edNumberofUtemsToUpdateCostprice: TEdit
         Left = 40
         Top = 71
         Width = 65
         Height = 23
         Hint = 'Enter how many items should be handled in a cycle. '
         TabOrder = 0
-        DisplayFormat = ',0;(,0)'
       end
     end
-    object tsGeneralLog: TRzTabSheet
-      OnShow = tsGeneralLogShow
+    object tsGeneralLog: TTabSheet
       Caption = 'Programlog'
-      object mmoLog: TRzMemo
+      OnShow = tsGeneralLogShow
+      object mmoLog: TMemo
         Left = 217
         Top = 0
         Width = 1150
@@ -915,7 +848,7 @@ object frmMain: TfrmMain
         Align = alClient
         TabOrder = 0
       end
-      object lbLogFiles: TRzListBox
+      object lbLogFiles: TListBox
         Left = 0
         Top = 0
         Width = 217
@@ -926,10 +859,10 @@ object frmMain: TfrmMain
         OnClick = lbLogFilesClick
       end
     end
-    object TabSheet5: TRzTabSheet
-      OnShow = TabSheet5Show
+    object TabSheet5: TTabSheet
       Caption = 'Business Central Log'
-      object lbBCLogFiles: TRzListBox
+      OnShow = TabSheet5Show
+      object lbBCLogFiles: TListBox
         Left = 0
         Top = 0
         Width = 297
@@ -939,7 +872,7 @@ object frmMain: TfrmMain
         TabOrder = 0
         OnClick = lbBCLogFilesClick
       end
-      object mmoBCLogs: TRzMemo
+      object mmoBCLogs: TMemo
         Left = 297
         Top = 0
         Width = 1070
@@ -948,10 +881,10 @@ object frmMain: TfrmMain
         TabOrder = 1
       end
     end
-    object TabSheet6: TRzTabSheet
-      OnShow = TabSheet6Show
+    object TabSheet6: TTabSheet
       Caption = 'Finanseksportlog'
-      object lbFinansLogFiles: TRzListBox
+      OnShow = TabSheet6Show
+      object lbFinansLogFiles: TListBox
         Left = 0
         Top = 0
         Width = 297
@@ -961,7 +894,7 @@ object frmMain: TfrmMain
         TabOrder = 0
         OnClick = lbFinansLogFilesClick
       end
-      object mmoFinansLog: TRzMemo
+      object mmoFinansLog: TMemo
         Left = 297
         Top = 0
         Width = 1070
@@ -970,10 +903,5 @@ object frmMain: TfrmMain
         TabOrder = 1
       end
     end
-  end
-  object RzSelectFolderDialog1: TRzSelectFolderDialog
-    Title = 'V'#230'lg folder til logfiler'
-    Left = 336
-    Top = 624
   end
 end

@@ -1,6 +1,6 @@
 # EasyPOS To Business Central - Integration Service
 
-[![Delphi](https://img.shields.io/badge/Delphi-12.3-red.svg)](https://www.embarcadero.com/products/delphi)
+[![Delphi](https://img.shields.io/badge/Delphi-13.1-red.svg)](https://www.embarcadero.com/products/delphi)
 [![Platform](https://img.shields.io/badge/Platform-Windows-blue.svg)](https://www.microsoft.com/windows)
 [![License](https://img.shields.io/badge/License-Proprietary-orange.svg)](LICENSE)
 
@@ -111,7 +111,7 @@ EasyPOS_To_BusinessCentral.dpr (Hovedprogram)
 
 ### Teknologi Stack
 
-- **Sprog:** Delphi 12.3 (Object Pascal)
+- **Sprog:** Delphi 13.1 (Object Pascal)
 - **Database:** Firebird SQL (via FireDAC)
 - **API:** REST Client med OAuth2/Basic Auth
 - **Serialization:** MVCFramework JSON
@@ -454,7 +454,7 @@ Omfattende dokumentation findes i **`Docs/`** mappen:
 
 ### Build Environment
 
-- **Delphi Version:** 12.3 Athens
+- **Delphi Version:** 13.1
 - **Project Group:** `EasyPOS_To_BusinessCentralGroup.groupproj`
 - **Main Project:** `EasyPOS_To_BusinessCentral.dproj`
 
