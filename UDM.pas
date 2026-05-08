@@ -203,7 +203,7 @@ var
   end;
 
 begin
-  AddToLog('  DoMailFile - START');
+  AddToLog('[INFO] DoMailFile - START');
 
   if FLastStatusCode = 503 then
   begin
@@ -227,7 +227,7 @@ begin
     lDoSendMail := TRUE;
   end;
 
-  AddToLog(Format('  Last statuscode: %s. DoSendMail: %s', [FLastStatusCode.ToString, lDoSendMail.ToString(TRUE)]));
+  AddToLog(Format('[INFO] Last statuscode: %s. DoSendMail: %s', [FLastStatusCode.ToString, lDoSendMail.ToString(TRUE)]));
   if lDoSendMail then
   begin
     lFromName := iniFile.ReadString('MAIL', 'From name', '');
@@ -242,32 +242,32 @@ begin
     lPassword := iniFile.ReadString('MAIL', 'Password', '');
     lUseTSL := iniFile.ReadBool('MAIL', 'UseTSL', FALSE);
 
-    AddToLog('    Filename: ' + aFileToAttach);
-    AddToLog('    Port: ' + lPort.ToString);
-    AddToLog('    Host: ' + lHost);
-    AddToLog('    MailFromName: ' + lFromName);
-    AddToLog('    MailFromMail: ' + lFromMail);
-    AddToLog('    MailReplyToName: ' + lReplyName);
-    AddToLog('    MailReplyToMail: ' + lReplyMail);
-    AddToLog('    MailSubject: ' + lSubject);
-    AddToLog('    MailReciever: ' + lRecipient);
+    AddToLog('[INFO]   Filename: ' + aFileToAttach);
+    AddToLog('[INFO]   Port: ' + lPort.ToString);
+    AddToLog('[INFO]   Host: ' + lHost);
+    AddToLog('[INFO]   MailFromName: ' + lFromName);
+    AddToLog('[INFO]   MailFromMail: ' + lFromMail);
+    AddToLog('[INFO]   MailReplyToName: ' + lReplyName);
+    AddToLog('[INFO]   MailReplyToMail: ' + lReplyMail);
+    AddToLog('[INFO]   MailSubject: ' + lSubject);
+    AddToLog('[INFO]   MailReceiver: ' + lRecipient);
 
     Result := FALSE;
     if (lRecipient <> '') AND (lHost <> '') then
     begin
       // CReate mail
-      AddToLog('    Create mailsetup');
+      AddToLog('[INFO]   Create mailsetup');
       lSendEMailMailSetup := TSendEMailMailSetup.Create(nil);
       try
         // Create SMTP
-        AddToLog('    Create smtpsetup');
+        AddToLog('[INFO]   Create smtpsetup');
         lSendEMailSMTPSetup := TSendEMailSMTPSetup.Create(nil);
         try
           // Set values.
-          AddToLog('    SetupMailSettings');
+          AddToLog('[INFO]   SetupMailSettings');
           SetupMailSettings(lSendEMailSMTPSetup, lSendEMailMailSetup);
 
-          AddToLog('    Set reply to, receiver, subject and attachment');
+          AddToLog('[INFO]   Set reply to, receiver, subject and attachment');
           lSendEMailMailSetup.ReplyToEMail := lReplyMail;
           lSendEMailMailSetup.ReplyToName := lReplyName;
           lSendEMailMailSetup.ReceivingEMail := lRecipient;
@@ -275,7 +275,7 @@ begin
           lSendEMailMailSetup.Attachment := aFileToAttach;
           MailContent := TStringList.Create;
           try
-            AddToLog('    Set content of mail');
+            AddToLog('[INFO]   Set content of mail');
             MailContent.Add(Format('Statuscode: %s', [FLastStatusCode.ToString]));
             if FLastStatusCode = 503 then
               MailContent.Add
@@ -285,25 +285,25 @@ begin
             lSendEMailMailSetup.EmailContent := MailContent;
 
             // Create Send mail
-            AddToLog('    Create mail');
+            AddToLog('[INFO]   Create mail');
             lSendEMail := TSendEMail.Create(lSendEMailSMTPSetup);
             try
               try
-                AddToLog(Format('    Send mail to %s', [lRecipient]));
+                AddToLog(Format('[INFO]   Send mail to %s', [lRecipient]));
                 Result := lSendEMail.SendEMail(lSendEMailMailSetup, aError);
                 if Result then
                 begin
-                  AddToLog(Format('    Mail sendt', []));
+                  AddToLog(Format('[INFO]   Mail sent', []));
                 end
                 else
                 begin
-                  AddToLog(Format('    Error: %s', [aError]));
+                  AddToLog(Format('[ERROR] Mail: %s', [aError]));
                 end;
               except
                 On E: Exception do
                 begin
-                  AddToLog('  ERROR. Cannot send mail. ');
-                  AddToLog(E.Message);
+                  AddToLog('[ERROR] Cannot send mail.');
+                  AddToLog('[ERROR] ' + E.Message);
                 end;
               end;
             finally
@@ -321,15 +321,15 @@ begin
     end
     else
     begin
-      AddToLog('  Host or reciever not set');
+      AddToLog('[WARN] Host or receiver not set - cannot send mail');
     end;
   end
   else
   begin
     Result := TRUE;
-    AddToLog('  We got a statuscode 503, and do not send email.');
+    AddToLog('[WARN] Statuscode 503 received - skipping email notification');
   end;
-  AddToLog('  DoMailFile - SLUT');
+  AddToLog('[INFO] DoMailFile - END');
 end;
 
 procedure TDM.AddToLog(aStringToWriteToLogFile: String);
@@ -458,7 +458,7 @@ var
   lDatabase: string;
 begin
   try
-    AddToLog('  Connecting to database');
+    AddToLog('[INFO] Connecting to database');
 
     lServer := Copy(EasyPOS_Database, 1, POS(':', EasyPOS_Database) - 1);
     lDatabase := Copy(EasyPOS_Database, POS(':', EasyPOS_Database) + 1, length(EasyPOS_Database) - POS(':', EasyPOS_Database));
@@ -471,7 +471,7 @@ begin
     dbMain.Params.Add('User_Name=' + EasyPOS_Database_User);
     dbMain.Params.Add('Password=' + EasyPOS_Database_Password);
     dbMain.Open;
-    AddToLog('  Connected to database');
+    AddToLog('[INFO] Connected to database');
     if (FetchBCSettings) then
     begin
       Result := TRUE;
@@ -479,7 +479,7 @@ begin
     else
     begin
       Result := FALSE;
-      AddToLog('  Business Central settings not set');
+      AddToLog('[WARN] Business Central settings not set');
     end;
   except
     on E: Exception do
@@ -496,7 +496,7 @@ begin
     if (tnMain.Active) then
       tnMain.Commit;
     dbMain.Close;
-    AddToLog('  Disconnected to database');
+    AddToLog('[INFO] Disconnected from database');
   except
     on E: Exception do
     begin
@@ -509,7 +509,7 @@ procedure TDM.InsertTracingLog(aArt: Integer; aDateFrom: TDateTime; aDateTo: TDa
 Const
   TillagArt: Integer = 3000;
 begin
-  AddToLog(Format('Insert tracing log in DB. ART:%s,  Transaction ID: %s', [IntToStr(TillagArt + +aArt), aTransID.ToString]));
+  AddToLog(Format('[INFO] Insert tracing log in DB. ART:%s,  Transaction ID: %s', [IntToStr(TillagArt + +aArt), aTransID.ToString]));
   try
     if (NOT(tnMain.Active)) then
       tnMain.StartTransaction;
@@ -595,7 +595,7 @@ begin
           INS_Sladre.ParamByName('PBonText').AsString := 'Financial records NOT synchronized with Business Central (Service) ';
         end;
     end;
-    AddToLog('  ' + INS_Sladre.ParamByName('PBonText').AsString);
+    AddToLog('[INFO] ' + INS_Sladre.ParamByName('PBonText').AsString);
 
     INS_Sladre.ParamByName('PLevNavn').AsString := 'TransID: Vare: ' + IntToStr(aTransID);
     INS_Sladre.ParamByName('PVareGrpId').AsString := '';
@@ -622,20 +622,20 @@ begin
   // {$IFDEF DEBUG}
   // AddToLog(Format('  DEBUG Fetching next transaction ID for %s.', [aTransactionIDUSedFor]));
   // Result := 1234567;
-  // AddToLog(Format('    Transaction ID: %d.', [Result]))
+  // AddToLog(Format('[INFO]   Transaction ID: %d.', [Result]))
   // {$ENDIF}
   // {$IFDEF RELEASE}
-  AddToLog(Format('  Fetching next transaction ID for %s.', [aTransactionIDUSedFor]));
+  AddToLog(Format('[INFO] Fetching next transaction ID for %s.', [aTransactionIDUSedFor]));
   GetNextTransactionIDToBC.ParamByName('Step').AsInteger := 1;
   GetNextTransactionIDToBC.ExecProc;
   Result := GetNextTransactionIDToBC.ParamByName('TransID').AsInteger;
-  AddToLog(Format('    Transaction ID: %d.', [Result]))
+  AddToLog(Format('[INFO]   Transaction ID: %d.', [Result]))
   // {$ENDIF}
 end;
 
 function TDM.FetchBCSettings: Boolean;
 begin
-  AddToLog('  Fetching Business Central settings from INI file');
+  AddToLog('[INFO] Fetching Business Central settings from INI file');
 
   LF_BC_BASEURL := iniFile.ReadString('BUSINESS CENTRAL', 'BC_BASEURL', '');
   LF_BC_PORT_Int := iniFile.ReadInteger('BUSINESS CENTRAL', 'BC_PORT', 0);
@@ -678,7 +678,7 @@ begin
     (LF_BC_PASSWORD = '') AND
     (LF_BC_ACTIVECOMPANYID = '') then
   begin
-    AddToLog('  Nothing set in INI file. Fetching from database');
+    AddToLog('[INFO] Nothing set in INI file. Fetching from database');
 
     QFinansTemp.SQL.Clear;
     QFinansTemp.SQL.Add('Select ');
@@ -704,19 +704,19 @@ begin
     QFinansTemp.Close;
   end;
 
-  AddToLog('  LF_BC_BASEURL: ' + LF_BC_BASEURL);
-  AddToLog('  LF_BC_PORT: ' + LF_BC_PORT_Str);
-  AddToLog('  LF_BC_COMPANY_URL: ' + LF_BC_COMPANY_URL);
-  AddToLog('  LF_BC_Environment: ' + LF_BC_Environment);
-  AddToLog('  LF_BC_USERNAME: ' + LF_BC_USERNAME);
+  AddToLog('[INFO] LF_BC_BASEURL: ' + LF_BC_BASEURL);
+  AddToLog('[INFO] LF_BC_PORT: ' + LF_BC_PORT_Str);
+  AddToLog('[INFO] LF_BC_COMPANY_URL: ' + LF_BC_COMPANY_URL);
+  AddToLog('[INFO] LF_BC_Environment: ' + LF_BC_Environment);
+  AddToLog('[INFO] LF_BC_USERNAME: ' + LF_BC_USERNAME);
   if LF_BC_PASSWORD <> '' then
-    AddToLog('  LF_BC_PASSWORD: ****')
+    AddToLog('[INFO] LF_BC_PASSWORD: ****')
   else
-    AddToLog('  LF_BC_PASSWORD: (empty)');
-  AddToLog('  LF_BC_ACTIVECOMPANYID: ' + LF_BC_ACTIVECOMPANYID);
+    AddToLog('[INFO] LF_BC_PASSWORD: (empty)');
+  AddToLog('[INFO] LF_BC_ACTIVECOMPANYID: ' + LF_BC_ACTIVECOMPANYID);
   // AddToLog('  LF_BC_Online: ' + LF_BC_Online.ToString(TRUE) + '   LF_BC_Version: ' + LF_BC_Version.ToString);
-  AddToLog('  LF_BC_Customer: ' + LF_BC_Customer + '   LF_BC_Version: ' + LF_BC_Version.ToString);
-  AddToLog(Format('Business Central version: %s (0: Current local based BC witrh basic authentication.   2: BC IN the sky with OAuth2 authentication) ', [LF_BC_Version.ToString]));
+  AddToLog('[INFO] LF_BC_Customer: ' + LF_BC_Customer + '   LF_BC_Version: ' + LF_BC_Version.ToString);
+  AddToLog(Format('[INFO] Business Central version: %s (0: Current local based BC witrh basic authentication.   2: BC IN the sky with OAuth2 authentication) ', [LF_BC_Version.ToString]));
 
   Result :=
     ((LF_BC_BASEURL <> '') AND
@@ -734,7 +734,7 @@ var
   FileAttrs: Integer;
   sr: TSearchRec;
 begin
-  AddToLog(Format('Do clear folder %s for files %s', [aFolder, aFile]));
+  AddToLog(Format('[INFO] Clear folder %s for files %s', [aFolder, aFile]));
   lFilSti := aFolder;
   // Set log file wildcard
   lFilNavn := lFilSti + aFile;
@@ -746,11 +746,11 @@ begin
     begin
       if (not(DeleteFile(PChar(lFilSti + sr.Name)))) then
       begin
-        AddToLog('  Could NOT delete: ' + lFilSti + sr.Name);
+        AddToLog('[WARN] Could NOT delete: ' + lFilSti + sr.Name);
       end
       else
       begin
-        AddToLog('  File deleted: ' + lFilSti + sr.Name);
+        AddToLog('[INFO] File deleted: ' + lFilSti + sr.Name);
       end;
     end;
   end;
@@ -762,15 +762,15 @@ begin
     begin
       if (not(DeleteFile(PChar(lFilSti + sr.Name)))) then
       begin
-        AddToLog('  Could NOT delete: ' + lFilSti + sr.Name);
+        AddToLog('[WARN] Could NOT delete: ' + lFilSti + sr.Name);
       end
       else
       begin
-        AddToLog('  File deleted: ' + lFilSti + sr.Name);
+        AddToLog('[INFO] File deleted: ' + lFilSti + sr.Name);
       end;
     end;
   end;
-  AddToLog('Log folder has been cleared');
+  AddToLog('[INFO] Log folder has been cleared');
   AddToLog('  ');
 end;
 
@@ -793,7 +793,7 @@ var
   var
     DoContinueWithInsert: Boolean;
     lGetResponse: TBusinessCentral_Response;
-    lErrotString: string;
+    lErrorString: string;
     lJSONStr: string;
     DoContinue: Boolean;
     lTotalRecords: Integer;
@@ -873,7 +873,7 @@ var
           qFetchVariant.FieldByName('SalgsPrisStk').AsFloat,
           'Removing stock to regulate costprice',
           'regulate'], glFormatSettings);
-        AddToLogCostprice(Format('  Remove stock: SQL: %s', [lSQLString]));
+        AddToLogCostprice(Format('[INFO] Remove stock: SQL: %s', [lSQLString]));
         qDoRegulation.Open(lSQLString, []);
       end;
 
@@ -882,7 +882,7 @@ var
         lSQLString: string;
       begin
         // Lets set a new cost price on this variant in this department.
-        AddToLogCostprice(Format('  Set costprice to %s on variant %s in department %s', [aCostprice.ToString, aBarcode, aDepartment]));
+        AddToLogCostprice(Format('[INFO] Set costprice to %s on variant %s in department %s', [aCostprice.ToString, aBarcode, aDepartment]));
         lLog := lLog + #13#10 + Format('  Set costprice to %s on variant %s in department %s', [aCostprice.ToString, aBarcode, aDepartment]);
         lSQLString := 'UPDATE VAREFRVSTR_DETAIL SET' + #13#10 +
           '  VAREFRVSTR_DETAIL.VEJETKOSTPRISSTK = :PVEJETKOSTPRISSTK, ' + #13#10 +
@@ -968,7 +968,7 @@ var
           qFetchVariant.FieldByName('SalgsPrisStk').AsFloat,
           'Adding stock to regulate costprice',
           'regulate'], glFormatSettings);
-        AddToLogCostprice(Format('  Adding stock: SQL: %s', [lSQLString]));
+        AddToLogCostprice(Format('[INFO] Adding stock: SQL: %s', [lSQLString]));
         qDoRegulation.Open(lSQLString, []);
       end;
 
@@ -987,7 +987,7 @@ var
         glFormatSettings.ThousandSeparator := #0;
         glFormatSettings.DecimalSeparator := '.';
 
-        AddToLogCostprice(Format('Variant %s number %s', [aBarcode, lRecordUpdateToItem.ToString]));
+        AddToLogCostprice(Format('[INFO] Variant %s number %s', [aBarcode, lRecordUpdateToItem.ToString]));
         lLog := lLog + #13#10 + Format('Variant %s number %s', [aBarcode, lRecordUpdateToItem.ToString]);
         qDepartmentsAndCurrency.Open;
         while (not(qDepartmentsAndCurrency.Eof)) do
@@ -1002,7 +1002,7 @@ var
             aCostprice)) then
           begin
             // If cost price with decimals are the same - skip
-            AddToLogCostprice(Format('  Costprice from Business Central is %s on variant %s which is the same in EasyPOS department %s. Skipping',
+            AddToLogCostprice(Format('[INFO] Costprice from BC is %s on variant %s - same in EasyPOS dept %s. Skipping in EasyPOS department %s. Skipping',
               [FormatFloat('#,#0', aCostprice),
               aBarcode,
               qDepartmentsAndCurrency.FieldByName('AFDELINGSNUMMER').AsString]));
@@ -1036,7 +1036,7 @@ var
           Result := FALSE;
           if (trUpdateCostprice.Active) then
             trUpdateCostprice.Rollback;
-          AddToLog(Format('DoSyncCostPriceFromBusinessCentral - ERROR. %s', [E.Message]));
+          AddToLog(Format('[ERROR] DoSyncCostPriceFromBusinessCentral: %s', [E.Message]));
           lLog := lLog + #13#10 + Format('DoSyncCostPriceFromBusinessCentral - ERROR. %s', [E.Message]);
           WriteEventLog(Format('DoSyncCostPriceFromBusinessCentral - ERROR. %s', [E.Message]), '', 'EasyPOS Windows Service to sync. with Business Central',
             EVENTLOG_ERROR_TYPE, 3599, 1);
@@ -1077,7 +1077,7 @@ var
     end;
 
   begin
-    AddToLog(Format('Checking head item %s with %s variants in Business Central. Item in this cycle: %s', [
+    AddToLog(Format('[INFO] Checking head item %s with %s variants in Business Central. Item in this cycle: %s', [
       QFetchItemsUpdateCostprice.FieldByName('PLU_NR').AsString,
       QFetchItemsUpdateCostprice.FieldByName('AntalVV').AsString,
       lNumberOfCostpriceUpdates.ToString]));
@@ -1099,7 +1099,7 @@ var
       trUpdateCostprice.StartTransaction;
     while (lSkipCount < lTotalRecords) AND (DoContinueWithInsert) do
     begin
-      AddToLog(Format('  Iteration %s. Handling %s variants. Skipping %s', [
+      AddToLog(Format('[INFO]   Iteration %s. Handling %s variants. Skipping %s', [
         lIteration.ToString,
         lBatchSize.ToString,
         lSkipCount.ToString]));
@@ -1109,7 +1109,7 @@ var
         lSkipCount.ToString]);
       lBusinessCentralSetup.FilterValue := BuildFilterString(lBatchSize, lSkipCount);
 
-      AddToLog(Format('  FilterValue %s', [lBusinessCentralSetup.FilterValue]));
+      AddToLog(Format('[INFO]   FilterValue %s', [lBusinessCentralSetup.FilterValue]));
       lLog := lLog + #13#10 + Format('  FilterValue %s', [lBusinessCentralSetup.FilterValue]);
       // Mine order v�rdier.-
       lBusinessCentralSetup.OrderValue := '';
@@ -1122,7 +1122,7 @@ var
         LF_BC_Version,
         FALSE,
         lContent);
-      AddToLog(Format('  Response: %s', [lContent]));
+      AddToLog(Format('[INFO]   Response: %s', [lContent]));
       lLog := lLog + #13#10 + Format('  Response: %s', [lContent]);
 
       if DoContinueWithInsert then
@@ -1130,7 +1130,7 @@ var
         if (lGetResponse as TkmCostprices).Value.Count > 0 then
         begin
           lReturnedRecordsFromBC := (lGetResponse as TkmCostprices).Value.Count;
-          AddToLog(Format('  Returned records from BC %d', [lReturnedRecordsFromBC]));
+          AddToLog(Format('[INFO]   Returned records from BC %d', [lReturnedRecordsFromBC]));
           lLog := lLog + #13#10 + Format('  Returned records from BC %d', [lReturnedRecordsFromBC]);
           // We have fetched some records. BArcode and Costprice (In DKK)
           // Time of handling this head item.
@@ -1144,7 +1144,7 @@ var
             begin
               // If costprice from BC is 0 - skip
               DoContinue := TRUE;
-              AddToLogCostprice(Format('  Costprice from Business Central is %s on variant %s. Skipping. Variant %s', [lkmCostprice.UnitCost.ToString, lkmCostprice.VareId,
+              AddToLogCostprice(Format('[INFO] Costprice from BC is %s on variant %s. Skipping. Variant %s', [lkmCostprice.UnitCost.ToString, lkmCostprice.VareId,
                 lRecordUpdateToItem.ToString]));
               lLog := lLog + #13#10 + Format('  Costprice from Business Central is %s on variant %s. Skipping. Variant %s', [lkmCostprice.UnitCost.ToString, lkmCostprice.VareId,
                 lRecordUpdateToItem.ToString]);
@@ -1160,7 +1160,7 @@ var
         else
         begin
           DoContinue := TRUE;
-          AddToLog(Format('  No records exist in Business Central to head item %s', [QFetchItemsUpdateCostprice.FieldByName('PLU_NR').AsString]));
+          AddToLog(Format('[INFO]   No records exist in BC for head item %s', [QFetchItemsUpdateCostprice.FieldByName('PLU_NR').AsString]));
           lLog := lLog + #13#10 + Format('  No records exist in Business Central to head item %s', [QFetchItemsUpdateCostprice.FieldByName('PLU_NR').AsString]);
         end;
       end
@@ -1171,15 +1171,15 @@ var
         FLastStatusCode := (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode;
         if ((lGetResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
           FLastDateTimeForStatusCode503 := NOW;
-        lErrotString := 'Unexpected error when fetching costprice in BC ' + #13#10 +
+        lErrorString := 'Unexpected error when fetching costprice in BC ' + #13#10 +
           '  EasyPOS Head item numbmer: ' + QFetchItemsUpdateCostprice.FieldByName('PLU_NR').AsString + #13#10 +
           '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
           '  Message: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
           '  JSON: ' + lJSONStr + #13#10;
-        AddToLog(lErrotString);
-        lLog := lLog + #13#10 + lErrotString;
-        AddToErrorLog(lErrotString, lUpdateCostpriceErrorFileName);
-        WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3503, 1);
+        AddToLog(lErrorString);
+        lLog := lLog + #13#10 + lErrorString;
+        AddToErrorLog(lErrorString, lUpdateCostpriceErrorFileName);
+        WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3503, 1);
       end;
       FReeAndNil(lGetResponse);
 
@@ -1209,13 +1209,13 @@ var
   end;
 
 begin
-  AddToLog('DoSyncCostPriceFromBusinessCentral - BEGIN');
+  AddToLog('[INFO] DoSyncCostPriceFromBusinessCentral - BEGIN');
   lStartTime := Now;
   lRegulationTime := Now;
   try
     if (ConnectToDB) then
     begin
-      AddToLog('  TBusinessCentralSetup.Create');
+      AddToLog('[INFO] TBusinessCentralSetup.Create');
       lBusinessCentralSetup := TBusinessCentralSetup.Create(LF_BC_BASEURL,
         LF_BC_PORT_Str,
         LF_BC_COMPANY_URL,
@@ -1225,26 +1225,26 @@ begin
         LF_BC_PASSWORD,
         LF_BC_Version);
       try
-        AddToLog('  TBusinessCentral.Create');
+        AddToLog('[INFO] TBusinessCentral.Create');
         lBusinessCentral := TBusinessCentral.Create(LogFileFolder);
         try
           if (NOT(tnMain.Active)) then
             tnMain.StartTransaction;
 
           // Log
-          AddToLog(Format('  Fetching items from EasyPOS marked to get costprice update.', []));
+          AddToLog(Format('[INFO] Fetching items marked for costprice update.', []));
 
           // Fetch items which are marked as Update costprice from Business Central
           QFetchItemsUpdateCostprice.SQL.SaveToFile(SQLLogFileFolder + 'ItemsUpdateCostprice.SQL');
           QFetchItemsUpdateCostprice.Open;
 
           // Log
-          AddToLog(Format('  Query opened', []));
+          AddToLog(Format('[INFO]   Query opened', []));
 
           if QFetchItemsUpdateCostprice.RecordCount > 0 then
           begin
             NumberOfItemsToHandle := iniFile.ReadInteger('Costprice', 'Items to handle per cycle', 50);
-            AddToLog(Format('  Handling %s items per cycle.', [NumberOfItemsToHandle.ToString]));
+            AddToLog(Format('[INFO]   Handling %s items per cycle.', [NumberOfItemsToHandle.ToString]));
 
             // At least 1 record is there
             lNumberOfCostpriceUpdates := 0;
@@ -1260,11 +1260,11 @@ begin
             end;
             if RoutineCanceled then
             begin
-              AddToLog('  Iteration done with errors. ');
+              AddToLog('[ERROR] Costprice iteration done with errors.');
             end
             else
             begin
-              AddToLog('  Iteration done succesfull');
+              AddToLog('[INFO] Iteration done successfully');
             end;
 
             QFetchItemsUpdateCostprice.Close;
@@ -1280,22 +1280,22 @@ begin
               lText := 'Der skete en fejl ved synkronisering af kostpriser fra Business Central.';
               if (tnMain.Active) then
                 tnMain.Rollback;
-              AddToLog(lText);
+              AddToLog('[ERROR] ' + lText);
             end;
-            AddToLog('  Routine done');
+            AddToLog('[INFO] Routine done');
           end
           else
           begin
             if (tnMain.Active) then
               tnMain.Commit;
-            AddToLog(Format('  No items set for costprice update', []));
+            AddToLog(Format('[INFO] No items set for costprice update', []));
           end;
         finally
-          AddToLog('  TBusinessCentral - Free');
+          AddToLog('[INFO] TBusinessCentral - Free');
           FReeAndNil(lBusinessCentral);
         end;
       finally
-        AddToLog('  TBusinessCentralSetup - Free');
+        AddToLog('[INFO] TBusinessCentralSetup - Free');
         FReeAndNil(lBusinessCentralSetup);
       end;
 
@@ -1304,25 +1304,25 @@ begin
   except
     on E: Exception do
     begin
-      AddToLog(Format('DoSyncCostPriceFromBusinessCentral - ERROR. %s', [E.Message]));
+      AddToLog(Format('[ERROR] DoSyncCostPriceFromBusinessCentral: %s', [E.Message]));
       WriteEventLog(Format('DoSyncCostPriceFromBusinessCentral - ERROR. %s', [E.Message]), '', 'EasyPOS Windows Service to sync. with Business Central',
         EVENTLOG_ERROR_TYPE, 3599, 1);
       if (tnMain.Active) then
         tnMain.Rollback;
       if Assigned(lBusinessCentral) then
       begin
-        AddToLog('  TBusinessCentral - Free');
+        AddToLog('[INFO] TBusinessCentral - Free');
         FReeAndNil(lBusinessCentral);
       end;
       if Assigned(lBusinessCentralSetup) then
       begin
-        AddToLog('  TBusinessCentralSetup - Free');
+        AddToLog('[INFO] TBusinessCentralSetup - Free');
         FReeAndNil(lBusinessCentralSetup);
       end;
     end;
   end;
   LogPerformance('DoSyncCostPriceFromBusinessCentral', lStartTime, lNumberOfCostpriceUpdates);
-  AddToLog('DoSyncCostPriceFromBusinessCentral - END');
+  AddToLog('[INFO] DoSyncCostPriceFromBusinessCentral - END');
 end;
 
 procedure TDM.DoSyncronizeFinansCialRecords;
@@ -1349,7 +1349,7 @@ var
     lFinansEKsportFileName: string;
     lExportFile: TextFile;
     Delimiter: string;
-    lErrotString: string;
+    lErrorString: string;
     lJSONStr: string;
     DoContinue: Boolean;
     DoContinueWithInsert: Boolean;
@@ -1408,7 +1408,7 @@ var
             trSetEksportedValueOnFinancialTrans.StartTransaction;
           end;
 
-          AddToLog('  Mark selected records as handled');
+          AddToLog('[INFO] Mark selected records as handled');
           QSetEksportedValueOnFinancialTrans.SQL.Clear;
 
           QSetEksportedValueOnFinancialTrans.SQL.Add('UPDATE Posteringer SET ');
@@ -1428,17 +1428,17 @@ var
           On E: Exception do
           begin
             Result := FALSE;
-            lErrotString := 'Unexpected error when marking financial record exported in EasyPOS ' + #13#10 +
+            lErrorString := 'Unexpected error when marking financial record exported in EasyPOS ' + #13#10 +
               '  EP ID: ' + aID.ToString + #13#10 +
               '  Message: ' + E.Message;
-            AddToLog(lErrotString);
-            AddToErrorLog(lErrotString, lErrorFileName);
-            WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3402, 1);
+            AddToLog(lErrorString);
+            AddToErrorLog(lErrorString, lErrorFileName);
+            WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3402, 1);
           end;
         end;
 {$ENDIF}
 {$IFDEF DEBUG}
-        AddToLog('  Will not mark records as handled. Only debug');
+        AddToLog('[WARN] Will not mark records as handled (debug mode)');
         Result := TRUE;
 {$ENDIF}
       end
@@ -1449,7 +1449,7 @@ var
     end;
 
   begin
-    AddToLog(Format('  Checking ID %s in Business Central', [QFetchFinancialRecords.FieldByName('ID').AsString]));
+    AddToLog(Format('[INFO]   Checking ID %s in Business Central', [QFetchFinancialRecords.FieldByName('ID').AsString]));
     lBusinessCentralSetup.FilterValue := Format('epId eq %s', [QFetchFinancialRecords.FieldByName('ID').AsString]);
     // Mine order v�rdier.-
     lBusinessCentralSetup.OrderValue := '';
@@ -1597,7 +1597,7 @@ var
           INC(lExportCounter);
 
           // Add to log
-          AddToLog(Format('  Financial record to transfer: %d - %s', [lExportCounter, lJSONStr]));
+          AddToLog(Format('[INFO]   Financial record to transfer: %d - %s', [lExportCounter, lJSONStr]));
           // {$IFDEF RELEASE}
           DoContinue := (lBusinessCentral.PostkmCashstatement(lBusinessCentralSetup, lkmCashstatement, lResponse, TRUE, LF_BC_Version));
           // {$ELSE}
@@ -1616,14 +1616,14 @@ var
             FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
             if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
               FLastDateTimeForStatusCode503 := NOW;
-            lErrotString := 'Der skete en uventet fejl ved inds�ttelse af finanspost i BC ' + #13#10 +
+            lErrorString := 'Der skete en uventet fejl ved inds�ttelse af finanspost i BC ' + #13#10 +
               '  EP ID: ' + QFetchFinancialRecords.FieldByName('ID').AsString + #13#10 +
               '  Code: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
               '  Message: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
               '  JSON: ' + lJSONStr + #13#10;
-            AddToLog(lErrotString);
+            AddToLog(lErrorString);
             INC(lErrorCounter);
-            AddToErrorLog(lErrotString, lErrorFileName);
+            AddToErrorLog(lErrorString, lErrorFileName);
           end;
           FReeAndNil(lResponse);
         finally
@@ -1632,7 +1632,7 @@ var
       end
       else
       begin
-        AddToLog(Format('  Already inserted. Skipping ID %s', [QFetchFinancialRecords.FieldByName('ID').AsString]));
+        AddToLog(Format('[INFO]   Already inserted. Skipping ID %s', [QFetchFinancialRecords.FieldByName('ID').AsString]));
         Result := MarkRecordAsHandled(QFetchFinancialRecords.FieldByName('ID').AsInteger);
       end;
     end
@@ -1643,25 +1643,25 @@ var
       FLastStatusCode := (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode;
       if ((lGetResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
         FLastDateTimeForStatusCode503 := NOW;
-      lErrotString := 'Unexpected error when checking financial record in BC ' + #13#10 +
+      lErrorString := 'Unexpected error when checking financial record in BC ' + #13#10 +
         '  ID: ' + QFetchFinancialRecords.FieldByName('ID').AsString + #13#10 +
         '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
         '  Message: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
         '  JSON: ' + lJSONStr + #13#10;
-      AddToLog(lErrotString);
-      AddToErrorLog(lErrotString, lErrorFileName);
-      WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3403, 1);
+      AddToLog(lErrorString);
+      AddToErrorLog(lErrorString, lErrorFileName);
+      WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3403, 1);
     end;
     FReeAndNil(lGetResponse);
   end;
 
 begin
-  AddToLog('DoSyncronizeFinansCialRecords - BEGIN');
+  AddToLog('[INFO] DoSyncronizeFinansCialRecords - BEGIN');
   lStartTime := Now;
   try
     if (ConnectToDB) then
     begin
-      AddToLog('  TBusinessCentralSetup.Create');
+      AddToLog('[INFO] TBusinessCentralSetup.Create');
       lBusinessCentralSetup := TBusinessCentralSetup.Create(LF_BC_BASEURL,
         LF_BC_PORT_Str,
         LF_BC_COMPANY_URL,
@@ -1671,7 +1671,7 @@ begin
         LF_BC_PASSWORD,
         LF_BC_Version);
       try
-        AddToLog('  TBusinessCentral.Create');
+        AddToLog('[INFO] TBusinessCentral.Create');
         lBusinessCentral := TBusinessCentral.Create(LogFileFolder);
         try
           if (NOT(tnMain.Active)) then
@@ -1680,13 +1680,13 @@ begin
           iniFile.DeleteKey('FinancialRecords', 'Voucher number as account number');
           lDaysToLookAfterRecords := iniFile.ReadInteger('FinancialRecords', 'Days to look for records', 5);
           // AddToLog(Format('Days to look for records if no LAST RUN is set:  %s', [lDaysToLookAfterRecords.ToString]));
-          AddToLog(Format('Days to look for records which are not yet transferred:  %s', [lDaysToLookAfterRecords.ToString]));
+          AddToLog(Format('[INFO] Days to look for records not yet transferred: %s', [lDaysToLookAfterRecords.ToString]));
           lDateAndTimeOfLastRun := iniFile.ReadDateTime('FinancialRecords', 'Last run', NOW - lDaysToLookAfterRecords);
           // lFromDateAndTime := lDateAndTimeOfLastRun;
           lFromDateAndTime := lDateAndTimeOfLastRun - lDaysToLookAfterRecords;
           lToDateAndTime := NOW;
 
-          AddToLog(Format('  Fetching records. Period %s to %s',
+          AddToLog(Format('[INFO]   Fetching records. Period %s to %s',
             [FormatDateTime('yyyy-mm-dd hh:mm:ss', lFromDateAndTime),
             FormatDateTime('yyyy-mm-dd hh:mm:ss', lToDateAndTime)]));
 
@@ -1714,7 +1714,7 @@ begin
                 QFetchFinancialRecords.Next;
               end;
             end;
-            AddToLog('  Iteration done');
+            AddToLog('[INFO] Iteration done');
 
             // Lets set a date for the last time we were in this routine
             iniFile.WriteDateTime('FinancialRecords', 'Last time sync to BC was tried', NOW);
@@ -1750,13 +1750,13 @@ begin
               InsertTracingLog(16, lFromDateAndTime, lToDateAndTime, BC_TransactionID);
             end;
 
-            AddToLog('  Routine done');
+            AddToLog('[INFO] Routine done');
             LogPerformance('DoSyncronizeFinansCialRecords', lStartTime, lExportCounter);
           end
           else
           begin
             // NO records selected
-            AddToLog('  No records');
+            AddToLog('[INFO] No records');
           end;
 
           QFetchFinancialRecords.Close;
@@ -1764,11 +1764,11 @@ begin
             tnMain.Commit;
 
         finally
-          AddToLog('  TBusinessCentral - Free');
+          AddToLog('[INFO] TBusinessCentral - Free');
           FReeAndNil(lBusinessCentral);
         end;
       finally
-        AddToLog('  TBusinessCentralSetup - Free');
+        AddToLog('[INFO] TBusinessCentralSetup - Free');
         FReeAndNil(lBusinessCentralSetup);
       end;
 
@@ -1778,13 +1778,13 @@ begin
   except
     on E: Exception do
     begin
-      AddToLog(Format('DoSyncronizeFinansCialRecords - ERROR. %s', [E.Message]));
+      AddToLog(Format('[ERROR] DoSyncronizeFinansCialRecords: %s', [E.Message]));
       WriteEventLog(Format('DoSyncronizeFinansCialRecords - ERROR. %s', [E.Message]), '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3499, 1);
       if (tnMain.Active) then
         tnMain.Rollback;
     end;
   end;
-  AddToLog('DoSyncronizeFinansCialRecords - END');
+  AddToLog('[INFO] DoSyncronizeFinansCialRecords - END');
   AddToLog('  ');
 end;
 
@@ -1859,7 +1859,7 @@ var
         lJSONStr := GetDefaultSerializer.SerializeObject(lkmItem);
 
         // Add to log
-        AddToLog(Format('    Head item to transfer: %d - %s', [lExportCounterHeadItems, lJSONStr]));
+        AddToLog(Format('[INFO]     Head item to transfer: %d - %s', [lExportCounterHeadItems, lJSONStr]));
         if OnlyTestRoutine then
         begin
           DoContinue := TRUE;
@@ -1881,7 +1881,7 @@ var
           FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
           if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
             FLastDateTimeForStatusCode503 := NOW;
-          AddToLog(Format('    ERROR (more in error file): %s - %s', [
+          AddToLog(Format('[ERROR] (more in error file): %s - %s', [
             (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString,
             (lResponse as TBusinessCentral_ErrorResponse).StatusText]));
           // ERROR - Do not continues with variants
@@ -1941,7 +1941,7 @@ var
         lJSONStr := GetDefaultSerializer.SerializeObject(lkmItem);
 
         // Add to log
-        AddToLog(Format('    Variantitem to transfer: %d - %s', [lExportCounterHeadItemVariants, lJSONStr]));
+        AddToLog(Format('[INFO]     Variant item to transfer: %d - %s', [lExportCounterHeadItemVariants, lJSONStr]));
         if OnlyTestRoutine then
         begin
           DoContinue := TRUE;
@@ -1963,7 +1963,7 @@ var
           FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
           if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
             FLastDateTimeForStatusCode503 := NOW;
-          AddToLog(Format('    ERROR (more in error file): %s - %s', [
+          AddToLog(Format('[ERROR] (more in error file): %s - %s', [
             (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString,
             (lResponse as TBusinessCentral_ErrorResponse).StatusText]));
           // ERROR - Do not continues with variants
@@ -1995,7 +1995,7 @@ var
       // Set current head item
       lCurrentHeadItem := QFetchItems.FieldByName('VareID').AsString;
       // Head item has changed. Do transfer
-      AddToLog(Format('  Adding head item %s to Business Central.', [QFetchItems.FieldByName('VareID').AsString]));
+      AddToLog(Format('[INFO]   Adding head item %s to Business Central.', [QFetchItems.FieldByName('VareID').AsString]));
 
       // Insert into kmItem (hovedvare)
       CreateAndInsertHeadItem;
@@ -2006,7 +2006,7 @@ var
         if NOT OnlyTestRoutine then
         begin
 {$IFNDEF DEBUG}
-          AddToLog(Format('    Head item %s marked as exported', [QFetchItems.FieldByName('VareID').AsString]));
+          AddToLog(Format('[INFO]     Head item %s marked as exported', [QFetchItems.FieldByName('VareID').AsString]));
           // Use own transaction to isolate update to not lock EasyPOS
           if (NOT(trUpdateItem.Active)) then
             trUpdateItem.StartTransaction;
@@ -2016,7 +2016,7 @@ var
           UpdItem.ExecSQL;
           if (trUpdateItem.Active) then
             trUpdateItem.Commit;
-          AddToLog(Format('    Handling variants to head item %s', [QFetchItems.FieldByName('VareID').AsString]));
+          AddToLog(Format('[INFO]     Handling variants to head item %s', [QFetchItems.FieldByName('VareID').AsString]));
 {$ENDIF}
         end;
       end;
@@ -2051,7 +2051,7 @@ var
         lJSONStr := GetDefaultSerializer.SerializeObject(lkmVariantId);
 
         // Add to log
-        AddToLog(Format('      Variant to transfer: %d - %s', [lExportCounterVariants, lJSONStr]));
+        AddToLog(Format('[INFO]       Variant to transfer: %d - %s', [lExportCounterVariants, lJSONStr]));
         // POST (INsert den)
         if OnlyTestRoutine then
         begin
@@ -2075,7 +2075,7 @@ var
           FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
           if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
             FLastDateTimeForStatusCode503 := NOW;
-          AddToLog(Format('    ERROR (more in error file): %s - %s', [
+          AddToLog(Format('[ERROR] (more in error file): %s - %s', [
             (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString,
             (lResponse as TBusinessCentral_ErrorResponse).StatusText]));
           // ERROR
@@ -2100,7 +2100,7 @@ var
         if NOT OnlyTestRoutine then
         begin
 {$IFNDEF DEBUG}
-          AddToLog(Format('      Variant %s marked as exported', [QFetchItems.FieldByName('VariantID').AsString]));
+          AddToLog(Format('[INFO]       Variant %s marked as exported', [QFetchItems.FieldByName('VariantID').AsString]));
           if (NOT(trUpdateItem.Active)) then
             trUpdateItem.StartTransaction;
           UpdItem.SQL.Clear;
@@ -2143,12 +2143,12 @@ begin
     Hvis de s� konsekvent kaster en 404 - s� skal jeg da unders�ge, hvis en bestemt varer kaster denne.
     Synes det er underligt at de er 404 for en bestemt
   *)
-  AddToLog('DoSyncronizeItems - BEGIN');
+  AddToLog('[INFO] DoSyncronizeItems - BEGIN');
   lStartTime := Now;
   try
     if (ConnectToDB) then
     begin
-      AddToLog('  TBusinessCentralSetup.Create');
+      AddToLog('[INFO] TBusinessCentralSetup.Create');
       lBusinessCentralSetup := TBusinessCentralSetup.Create(LF_BC_BASEURL,
         LF_BC_PORT_Str,
         LF_BC_COMPANY_URL,
@@ -2158,8 +2158,8 @@ begin
         LF_BC_PASSWORD,
         LF_BC_Version);
       try
-        AddToLog(Format('  BC Url: %s', [lBusinessCentralSetup.BuildEntireURL(LF_BC_Version)]));
-        AddToLog('  TBusinessCentral.Create');
+        AddToLog(Format('[INFO]   BC Url: %s', [lBusinessCentralSetup.BuildEntireURL(LF_BC_Version)]));
+        AddToLog('[INFO] TBusinessCentral.Create');
         lBusinessCentral := TBusinessCentral.Create(LogFileFolder);
         try
           if (NOT(tnMain.Active)) then
@@ -2172,10 +2172,10 @@ begin
           lFromDateAndTime := lDateAndTimeOfLastRun;
           lToDateAndTime := NOW;
 
-          AddToLog(Format('  Department: %s ', [lDepartment]));
-          AddToLog(Format('  Days to look after records if not last run i in INI file: %s ', [lDaysToLookAfterRecords.ToString]));
-          AddToLog(Format('  Date/time of last run: %s ', [FormatDateTime('dd-mm-yyyy hh:mm:ss', lDateAndTimeOfLastRun)]));
-          AddToLog(Format('  Fetching Items. Period %s to %s', [FormatDateTime('yyyy-mm-dd hh:mm:ss', lFromDateAndTime), FormatDateTime('yyyy-mm-dd hh:mm:ss', lToDateAndTime)]));
+          AddToLog(Format('[INFO]   Department: %s', [lDepartment]));
+          AddToLog(Format('[INFO]   Days to look after records if no last run in INI: %s', [lDaysToLookAfterRecords.ToString]));
+          AddToLog(Format('[INFO]   Date/time of last run: %s', [FormatDateTime('dd-mm-yyyy hh:mm:ss', lDateAndTimeOfLastRun)]));
+          AddToLog(Format('[INFO]   Fetching items. Period %s to %s', [FormatDateTime('yyyy-mm-dd hh:mm:ss', lFromDateAndTime), FormatDateTime('yyyy-mm-dd hh:mm:ss', lToDateAndTime)]));
 
           QFetchItems.SQL.Clear;
 {$IFDEF RELEASE}
@@ -2336,7 +2336,7 @@ begin
           QFetchItems.Open;
           QFetchItems.FetchAll;
 
-          AddToLog(Format('  Items fetched: %d', [QFetchItems.RecordCount]));
+          AddToLog(Format('[INFO]   Items fetched: %d', [QFetchItems.RecordCount]));
 
           lExportCounterHeadItems := 0;
           lExportCounterHeadItemVariants := 0;
@@ -2357,9 +2357,9 @@ begin
               if (lErrorCounter = 0) then
                 QFetchItems.Next;
             end;
-            AddToLog('  Iteration done');
-            AddToLog(Format('  Exported %d head items, %d head item variants and %d variants', [lExportCounterHeadItems, lExportCounterHeadItemVariants, lExportCounterVariants]));
-            AddToLog('  Routine done');
+            AddToLog('[INFO] Iteration done');
+            AddToLog(Format('[INFO]   Exported %d head items, %d head item variants and %d variants', [lExportCounterHeadItems, lExportCounterHeadItemVariants, lExportCounterVariants]));
+            AddToLog('[INFO] Routine done');
             iniFile.WriteDateTime('Items', 'Last time sync to BC was tried', NOW);
             if lErrorCounter = 0 then
             begin
@@ -2370,7 +2370,7 @@ begin
           else
           begin
             // NO records selected
-            AddToLog('  No records');
+            AddToLog('[INFO] No records');
           end;
 
           QFetchItems.Close;
@@ -2396,11 +2396,11 @@ begin
             InsertTracingLog(1, lFromDateAndTime, lToDateAndTime, BC_ItemsTransactionID);
           end;
         finally
-          AddToLog('  TBusinessCentral - Free');
+          AddToLog('[INFO] TBusinessCentral - Free');
           FReeAndNil(lBusinessCentral);
         end;
       finally
-        AddToLog('  TBusinessCentralSetup - Free');
+        AddToLog('[INFO] TBusinessCentralSetup - Free');
         FReeAndNil(lBusinessCentralSetup);
       end;
 
@@ -2415,7 +2415,7 @@ begin
     end;
   end;
   LogPerformance('DoSyncronizeItems', lStartTime, lExportCounterHeadItems + lExportCounterHeadItemVariants);
-  AddToLog('DoSyncronizeItems - END');
+  AddToLog('[INFO] DoSyncronizeItems - END');
   AddToLog('  ');
 end;
 
@@ -2441,7 +2441,7 @@ var
     lResponse: TBusinessCentral_Response;
     lJSONStr: string;
     DoContinue: Boolean;
-    lErrotString: string;
+    lErrorString: string;
     DoContinueWithInsert: Boolean;
     lGetResponse: TBusinessCentral_Response;
     lContent: string;
@@ -2475,12 +2475,12 @@ var
           On E: Exception do
           begin
             Result := FALSE;
-            lErrotString := 'Unexpected error when marking sale transaction exported in EasyPOS ' + #13#10 +
+            lErrorString := 'Unexpected error when marking sale transaction exported in EasyPOS ' + #13#10 +
               '  EP ID: ' + QFetchSalesTransactions.FieldByName('EPID').AsString + #13#10 +
               '  Message: ' + E.Message;
-            AddToLog(lErrotString);
-            AddToErrorLog(lErrotString, lSalesTransactionErrorFileName);
-            WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3201, 1);
+            AddToLog(lErrorString);
+            AddToErrorLog(lErrorString, lSalesTransactionErrorFileName);
+            WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3201, 1);
           end;
         end;
 {$ENDIF}
@@ -2495,7 +2495,7 @@ var
     end;
 
   begin
-    AddToLog(Format('  Checking epid %s in Business Central', [QFetchSalesTransactions.FieldByName('EpID').AsString]));
+    AddToLog(Format('[INFO]   Checking epid %s in Business Central', [QFetchSalesTransactions.FieldByName('EpID').AsString]));
     lBusinessCentralSetup.FilterValue := Format('epId eq %s', [QFetchSalesTransactions.FieldByName('EpID').AsString]);
     // Mine order v�rdier.-
     lBusinessCentralSetup.OrderValue := '';
@@ -2543,7 +2543,7 @@ var
           INC(lNumberOfExportedSalesTransactions);
 
           // Add to log
-          AddToLog(Format('  Sale transaction record to transfer: %d - %s', [lNumberOfExportedSalesTransactions, lJSONStr]));
+          AddToLog(Format('[INFO]   Sale transaction record to transfer: %d - %s', [lNumberOfExportedSalesTransactions, lJSONStr]));
           if OnlyTestRoutine then
           begin
             DoContinue := TRUE;
@@ -2566,14 +2566,14 @@ var
             FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
             if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
               FLastDateTimeForStatusCode503 := NOW;
-            lErrotString := 'Unexpected error when inserting sale transaction in BC ' + #13#10 +
+            lErrorString := 'Unexpected error when inserting sale transaction in BC ' + #13#10 +
               '  EP ID: ' + QFetchSalesTransactions.FieldByName('EPID').AsString + #13#10 +
               '  Code: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
               '  Message: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
               '  JSON: ' + lJSONStr + #13#10;
-            AddToLog(lErrotString);
-            AddToErrorLog(lErrotString, lSalesTransactionErrorFileName);
-            WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3202, 1);
+            AddToLog(lErrorString);
+            AddToErrorLog(lErrorString, lSalesTransactionErrorFileName);
+            WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3202, 1);
           end;
 
           FReeAndNil(lResponse);
@@ -2583,7 +2583,7 @@ var
       end
       else
       begin
-        AddToLog(Format('  Already inserted. Skipping epId %s', [QFetchSalesTransactions.FieldByName('EpID').AsString]));
+        AddToLog(Format('[INFO]   Already inserted. Skipping epId %s', [QFetchSalesTransactions.FieldByName('EpID').AsString]));
         Result := DoMarkSalesTransactionsAsExported;
       end;
     end
@@ -2594,25 +2594,25 @@ var
       FLastStatusCode := (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode;
       if ((lGetResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
         FLastDateTimeForStatusCode503 := NOW;
-      lErrotString := 'Unexpected error when checking sale transaction in BC ' + #13#10 +
+      lErrorString := 'Unexpected error when checking sale transaction in BC ' + #13#10 +
         '  EP ID: ' + QFetchSalesTransactions.FieldByName('EPID').AsString + #13#10 +
         '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
         '  Message: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
         '  JSON: ' + lJSONStr + #13#10;
-      AddToLog(lErrotString);
-      AddToErrorLog(lErrotString, lSalesTransactionErrorFileName);
-      WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3203, 1);
+      AddToLog(lErrorString);
+      AddToErrorLog(lErrorString, lSalesTransactionErrorFileName);
+      WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3203, 1);
     end;
     FReeAndNil(lGetResponse);
   end;
 
 begin
-  AddToLog('DoSyncronizeSalesTransactions - BEGIN');
+  AddToLog('[INFO] DoSyncronizeSalesTransactions - BEGIN');
   lStartTime := Now;
   try
     if (ConnectToDB) then
     begin
-      AddToLog('  TBusinessCentralSetup.Create');
+      AddToLog('[INFO] TBusinessCentralSetup.Create');
       lBusinessCentralSetup := TBusinessCentralSetup.Create(LF_BC_BASEURL,
         LF_BC_PORT_Str,
         LF_BC_COMPANY_URL,
@@ -2622,7 +2622,7 @@ begin
         LF_BC_PASSWORD,
         LF_BC_Version);
       try
-        AddToLog('  TBusinessCentral.Create');
+        AddToLog('[INFO] TBusinessCentral.Create');
         lBusinessCentral := TBusinessCentral.Create(LogFileFolder);
         try
           if (NOT(tnMain.Active)) then
@@ -2630,7 +2630,7 @@ begin
 
           lDaysToLookAfterRecords := iniFile.ReadInteger('SalesTransaction', 'Days to look for records', 5);
           // AddToLog(Format('Days to look for records if no LAST RUN is set:  %s', [lDaysToLookAfterRecords.ToString]));
-          AddToLog(Format('Days to look for records which has not yet been transferred:  %s', [lDaysToLookAfterRecords.ToString]));
+          AddToLog(Format('[INFO] Days to look for records not yet transferred: %s', [lDaysToLookAfterRecords.ToString]));
           // Date of last run
           lDateAndTimeOfLastRun := iniFile.ReadDateTime('SalesTransaction', 'Last run', NOW - lDaysToLookAfterRecords);
           // lFromDateAndTime := lDateAndTimeOfLastRun;
@@ -2639,7 +2639,7 @@ begin
           lToDateAndTime := NOW;
 
           // Log
-          AddToLog(Format('  Fetching sales transactions. Period %s to %s',
+          AddToLog(Format('[INFO]   Fetching sales transactions. Period %s to %s',
             [FormatDateTime('yyyy-mm-dd hh:mm:ss', lFromDateAndTime),
             FormatDateTime('yyyy-mm-dd hh:mm:ss', lToDateAndTime)]));
 
@@ -2650,7 +2650,7 @@ begin
           QFetchSalesTransactions.Open;
 
           // Log
-          AddToLog(Format('  Query opened', []));
+          AddToLog(Format('[INFO]   Query opened', []));
 
           if QFetchSalesTransactions.RecordCount > 0 then
           begin
@@ -2669,11 +2669,11 @@ begin
             end;
             if RoutineCanceled then
             begin
-              AddToLog('  Iteration done with errors. ');
+              AddToLog('[ERROR] Costprice iteration done with errors.');
             end
             else
             begin
-              AddToLog('  Iteration done succesfull');
+              AddToLog('[INFO] Iteration done successfully');
             end;
 
             QFetchSalesTransactions.Close;
@@ -2704,24 +2704,24 @@ begin
               TFile.Move(LogFileFolder + lSalesTransactionErrorFileName, LogFileFolder + Format('Error_SalesTransactions_%s.txt', [FormatDateTime('ddmmyyyy_hhmmss', NOW)]));
               if (tnMain.Active) then
                 tnMain.Rollback;
-              AddToLog('  Export of sales transaction ended with errors.');
+              AddToLog('[ERROR] Export of sales transactions ended with errors.');
               InsertTracingLog(6, lFromDateAndTime, lToDateAndTime, BC_TransactionID);
             end;
             iniFile.WriteDateTime('SalesTransaction', 'Last time sync to BC was tried', NOW);
-            AddToLog('  Routine done');
+            AddToLog('[INFO] Routine done');
           end
           else
           begin
             if (tnMain.Active) then
               tnMain.Commit;
-            AddToLog(Format('  No sales transactions to export', []));
+            AddToLog(Format('[INFO] No sales transactions to export', []));
           end;
         finally
-          AddToLog('  TBusinessCentral - Free');
+          AddToLog('[INFO] TBusinessCentral - Free');
           FReeAndNil(lBusinessCentral);
         end;
       finally
-        AddToLog('  TBusinessCentralSetup - Free');
+        AddToLog('[INFO] TBusinessCentralSetup - Free');
         FReeAndNil(lBusinessCentralSetup);
       end;
 
@@ -2735,7 +2735,7 @@ begin
         tnMain.Rollback;
     end;
   end;
-  AddToLog('DoSyncronizeSalesTransactions - END');
+  AddToLog('[INFO] DoSyncronizeSalesTransactions - END');
 end;
 
 procedure TDM.DoSyncronizeMovemmentsTransaction;
@@ -2760,7 +2760,7 @@ var
     lkmItemMove: TkmItemMove;
     lJSONStr: string;
     DoContinue: Boolean;
-    lErrotString: string;
+    lErrorString: string;
     DoContinueWithInsert: Boolean;
     lGetResponse: TBusinessCentral_Response;
 
@@ -2793,12 +2793,12 @@ var
           On E: Exception do
           begin
             Result := FALSE;
-            lErrotString := 'Unexpected error when marking movement transaction exported in EasyPOS ' + #13#10 +
+            lErrorString := 'Unexpected error when marking movement transaction exported in EasyPOS ' + #13#10 +
               '  EP ID: ' + QFetchMovementsTransactions.FieldByName('EPID').AsString + #13#10 +
               '  Message: ' + E.Message;
-            AddToLog(lErrotString);
-            AddToErrorLog(lErrotString, lMovementsTransactionErrorFileName);
-            WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3301, 1);
+            AddToLog(lErrorString);
+            AddToErrorLog(lErrorString, lMovementsTransactionErrorFileName);
+            WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3301, 1);
           end;
         end;
 {$ENDIF}
@@ -2813,7 +2813,7 @@ var
     end;
 
   begin
-    AddToLog(Format('  Checking epid %s in Business Central', [QFetchMovementsTransactions.FieldByName('EpID').AsString]));
+    AddToLog(Format('[INFO]   Checking epid %s in Business Central', [QFetchMovementsTransactions.FieldByName('EpID').AsString]));
     lBusinessCentralSetup.FilterValue := Format('epid eq %s', [QFetchMovementsTransactions.FieldByName('EpID').AsString]);
     // Mine order v�rdier.-
     lBusinessCentralSetup.OrderValue := '';
@@ -2860,7 +2860,7 @@ var
 
           INC(lNumberOfExportedMovementsTransactions);
           // Add to log
-          AddToLog(Format('  Movement transaction record to transfer: %d - %s', [lNumberOfExportedMovementsTransactions, lJSONStr]));
+          AddToLog(Format('[INFO]   Movement transaction record to transfer: %d - %s', [lNumberOfExportedMovementsTransactions, lJSONStr]));
           if OnlyTestRoutine then
           begin
             DoContinue := TRUE;
@@ -2882,14 +2882,14 @@ var
             FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
             if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
               FLastDateTimeForStatusCode503 := NOW;
-            lErrotString := 'Unexpected error when inserting movement transaction in BC ' + #13#10 +
+            lErrorString := 'Unexpected error when inserting movement transaction in BC ' + #13#10 +
               '  EP TransID: ' + QFetchMovementsTransactions.FieldByName('FlytningsID').AsString + #13#10 +
               '  Code: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
               '  Message: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
               '  JSON: ' + lJSONStr + #13#10;
-            AddToLog(lErrotString);
-            AddToErrorLog(lErrotString, lMovementsTransactionErrorFileName);
-            WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3302, 1);
+            AddToLog(lErrorString);
+            AddToErrorLog(lErrorString, lMovementsTransactionErrorFileName);
+            WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3302, 1);
           end;
           FReeAndNil(lResponse);
         finally
@@ -2898,7 +2898,7 @@ var
       end
       else
       begin
-        AddToLog(Format('  Already inserted. Skipping epId %s', [QFetchMovementsTransactions.FieldByName('EpID').AsString]));
+        AddToLog(Format('[INFO]   Already inserted. Skipping epId %s', [QFetchMovementsTransactions.FieldByName('EpID').AsString]));
         Result := DoMarkMovementTransactionsAsExported;
       end;
     end
@@ -2909,25 +2909,25 @@ var
       FLastStatusCode := (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode;
       if ((lGetResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
         FLastDateTimeForStatusCode503 := NOW;
-      lErrotString := 'Unexpected error when checking movement transaction in BC ' + #13#10 +
+      lErrorString := 'Unexpected error when checking movement transaction in BC ' + #13#10 +
         '  EP ID: ' + QFetchMovementsTransactions.FieldByName('EPID').AsString + #13#10 +
         '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
         '  Message: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
         '  JSON: ' + lJSONStr + #13#10;
-      AddToLog(lErrotString);
-      AddToErrorLog(lErrotString, lMovementsTransactionErrorFileName);
-      WriteEventLog(lErrotString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3303, 1);
+      AddToLog(lErrorString);
+      AddToErrorLog(lErrorString, lMovementsTransactionErrorFileName);
+      WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3303, 1);
     end;
     FReeAndNil(lGetResponse);
   end;
 
 begin
-  AddToLog('DoSyncronizeMovemmentsTransaction - BEGIN');
+  AddToLog('[INFO] DoSyncronizeMovementsTransactions - BEGIN');
   lStartTime := Now;
   try
     if (ConnectToDB) then
     begin
-      AddToLog('  TBusinessCentralSetup.Create');
+      AddToLog('[INFO] TBusinessCentralSetup.Create');
       lBusinessCentralSetup := TBusinessCentralSetup.Create(LF_BC_BASEURL,
         LF_BC_PORT_Str,
         LF_BC_COMPANY_URL,
@@ -2937,7 +2937,7 @@ begin
         LF_BC_PASSWORD,
         LF_BC_Version);
       try
-        AddToLog('  TBusinessCentral.Create');
+        AddToLog('[INFO] TBusinessCentral.Create');
         lBusinessCentral := TBusinessCentral.Create(LogFileFolder);
         try
           if (NOT(tnMain.Active)) then
@@ -2946,7 +2946,7 @@ begin
           // Date of last run
           lDaysToLookAfterRecords := iniFile.ReadInteger('MovementsTransaction', 'Days to look for records', 5);
           // AddToLog(Format('Days to look for records if no LAST RUN is set:  %s', [lDaysToLookAfterRecords.ToString]));
-          AddToLog(Format('Days to look for records which has not yet been transferred:  %s', [lDaysToLookAfterRecords.ToString]));
+          AddToLog(Format('[INFO] Days to look for records not yet transferred: %s', [lDaysToLookAfterRecords.ToString]));
           lDateAndTimeOfLastRun := iniFile.ReadDateTime('MovementsTransaction', 'Last run', NOW - lDaysToLookAfterRecords);
           // lFromDateAndTime := lDateAndTimeOfLastRun;
           lFromDateAndTime := lDateAndTimeOfLastRun - lDaysToLookAfterRecords;
@@ -2954,7 +2954,7 @@ begin
           lToDateAndTime := NOW;
 
           // Log
-          AddToLog(Format('  Fetching records. movements transactons. Period %s to %s',
+          AddToLog(Format('[INFO]   Fetching movements transactions. Period %s to %s',
             [FormatDateTime('yyyy-mm-dd hh:mm:ss', lFromDateAndTime),
             FormatDateTime('yyyy-mm-dd hh:mm:ss', lToDateAndTime)]));
 
@@ -2966,7 +2966,7 @@ begin
           QFetchMovementsTransactions.SQL.SaveToFile(SQLLogFileFolder + 'MovementsTransactions.SQL');
           QFetchMovementsTransactions.Open;
           // Log
-          AddToLog(Format('  Query opened', []));
+          AddToLog(Format('[INFO]   Query opened', []));
           If (Not(QFetchMovementsTransactions.Eof)) then
           begin
             // At least 1 record is there - fetch next transactions UD
@@ -2981,7 +2981,7 @@ begin
                 QFetchMovementsTransactions.Next;
               end;
             end;
-            AddToLog('  Iteration done');
+            AddToLog('[INFO] Iteration done');
 
             QFetchMovementsTransactions.Close;
             if (tnMain.Active) then
@@ -3006,24 +3006,24 @@ begin
                 [FormatDateTime('ddmmyyyy_hhmmss', NOW)]));
               if (tnMain.Active) then
                 tnMain.Rollback;
-              AddToLog('  Export of movements transaction ended with errors.');
+              AddToLog('[ERROR] Export of movements transactions ended with errors.');
               InsertTracingLog(12, lFromDateAndTime, lToDateAndTime, BC_TransactionID);
             end;
             iniFile.WriteDateTime('MovementsTransaction', 'Last time sync to BC was tried', NOW);
-            AddToLog('  Routine done');
+            AddToLog('[INFO] Routine done');
           end
           else
           begin
             if (tnMain.Active) then
               tnMain.Commit;
-            AddToLog(Format('  No Movements transactions to export', []));
+            AddToLog(Format('[INFO] No movements transactions to export', []));
           end;
         finally
-          AddToLog('  TBusinessCentral - Free');
+          AddToLog('[INFO] TBusinessCentral - Free');
           FReeAndNil(lBusinessCentral);
         end;
       finally
-        AddToLog('  TBusinessCentralSetup - Free');
+        AddToLog('[INFO] TBusinessCentralSetup - Free');
         FReeAndNil(lBusinessCentralSetup);
       end;
 
@@ -3037,7 +3037,7 @@ begin
         tnMain.Rollback;
     end;
   end;
-  AddToLog('DoSyncronizeMovemmentsTransaction - END');
+  AddToLog('[INFO] DoSyncronizeMovementsTransactions - END');
 end;
 
 // procedure TDM.DoSyncronizeStockRegulationTransaction;
@@ -3060,7 +3060,7 @@ end;
 // var
 // lJSONStr: string;
 // DoContinue: Boolean;
-// lErrotString: string;
+// lErrorString: string;
 // lkmItemAccess: TkmItemAccess;
 // DoContinueWithInsert: Boolean;
 // lGetResponse: TBusinessCentral_Response;
@@ -3102,7 +3102,7 @@ end;
 // begin
 // Result := FALSE;
 //
-// lErrotString := Format('Unexpected error when marking stock regulation transaction exported in EasyPOS ' + #13#10 +
+// lErrorString := Format('Unexpected error when marking stock regulation transaction exported in EasyPOS ' + #13#10 +
 // 'lagertilgangsnummer eq ''%s'' and leverandRKode eq ''%s'' and butikId eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central' + #13#10 +
 // 'Message: %s', [
 // QFetchStockRegulationsTransactions.FieldByName('Lagertilgangsnummer').AsString,
@@ -3111,8 +3111,8 @@ end;
 // FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime),
 // E.Message
 // ]);
-// AddToLog(lErrotString);
-// AddToErrorLog(lErrotString, lStockRegulationsTransactionErrorFileName);
+// AddToLog(lErrorString);
+// AddToErrorLog(lErrorString, lStockRegulationsTransactionErrorFileName);
 // end;
 // end;
 // {$ENDIF}
@@ -3185,13 +3185,13 @@ end;
 // begin
 // Result := FALSE;
 //
-// lErrotString := 'Unexpected error when inserting stock regulation transaction in BC ' + #13#10 +
+// lErrorString := 'Unexpected error when inserting stock regulation transaction in BC ' + #13#10 +
 // '  EP Bonnr: ' + QFetchStockRegulationsTransactions.FieldByName('LagerTilgangsNummer').AsString + #13#10 +
 // '  Code: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
 // '  Message: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
 // '  JSON: ' + lJSONStr + #13#10;
-// AddToLog(lErrotString);
-// AddToErrorLog(lErrotString, lStockRegulationsTransactionErrorFileName);
+// AddToLog(lErrorString);
+// AddToErrorLog(lErrorString, lStockRegulationsTransactionErrorFileName);
 // end;
 // FReeAndNil(lResponse);
 // finally
@@ -3215,13 +3215,13 @@ end;
 // begin
 // // Do not continue. Some error from BC when trying to get a record
 // Result := FALSE;
-// lErrotString := 'Unexpected error when checking stock regulation transaction in BC ' + #13#10 +
+// lErrorString := 'Unexpected error when checking stock regulation transaction in BC ' + #13#10 +
 // '  EP ID: ' + QFetchStockRegulationsTransactions.FieldByName('EPID').AsString + #13#10 +
 // '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
 // '  Message: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
 // '  JSON: ' + lJSONStr + #13#10;
-// AddToLog(lErrotString);
-// AddToErrorLog(lErrotString, lStockRegulationsTransactionErrorFileName);
+// AddToLog(lErrorString);
+// AddToErrorLog(lErrorString, lStockRegulationsTransactionErrorFileName);
 // end;
 // FReeAndNil(lGetResponse);
 // end;
@@ -3230,7 +3230,7 @@ end;
 // AddToLog('DoSyncronizeStockRegulationTransaction - BEGIN');
 // if (ConnectToDB) then
 // begin
-// AddToLog('  TBusinessCentralSetup.Create');
+// AddToLog('[INFO] TBusinessCentralSetup.Create');
 // lBusinessCentralSetup := TBusinessCentralSetup.Create(LF_BC_BASEURL,
 // LF_BC_PORT_Str,
 // LF_BC_COMPANY_URL,
@@ -3240,7 +3240,7 @@ end;
 // LF_BC_PASSWORD,
 // LF_BC_Version);
 // try
-// AddToLog('  TBusinessCentral.Create');
+// AddToLog('[INFO] TBusinessCentral.Create');
 // lBusinessCentral := TBusinessCentral.Create(LogFileFolder);
 // try
 // if (NOT(tnMain.Active)) then
@@ -3264,7 +3264,7 @@ end;
 // QFetchStockRegulationsTransactions.Open;
 //
 // // Log
-// AddToLog(Format('  Query opened', []));
+// AddToLog(Format('[INFO]   Query opened', []));
 // If (Not(QFetchStockRegulationsTransactions.EOF)) then
 // begin
 // // At least 1 record is there - fetch next transactions UD
@@ -3279,7 +3279,7 @@ end;
 // QFetchStockRegulationsTransactions.Next;
 // end;
 // end;
-// AddToLog('  Iteration done');
+// AddToLog('[INFO] Iteration done');
 //
 // QFetchStockRegulationsTransactions.Close;
 // if (tnMain.Active) then
@@ -3307,7 +3307,7 @@ end;
 // InsertTracingLog(8, lFromDateAndTime, lToDateAndTime, BC_TransactionID);
 // end;
 // iniFile.WriteDateTime('StockRegulation', 'Last time sync to BC was tried', NOW);
-// AddToLog('  Routine done');
+// AddToLog('[INFO] Routine done');
 // end
 // else
 // begin
@@ -3316,11 +3316,11 @@ end;
 // AddToLog(Format('  No stock regulation transactions to export', []));
 // end;
 // finally
-// AddToLog('  TBusinessCentral - Free');
+// AddToLog('[INFO] TBusinessCentral - Free');
 // FReeAndNil(lBusinessCentral);
 // end;
 // finally
-// AddToLog('  TBusinessCentralSetup - Free');
+// AddToLog('[INFO] TBusinessCentralSetup - Free');
 // FReeAndNil(lBusinessCentralSetup);
 // end;
 //
@@ -3355,16 +3355,16 @@ begin
       lSyncronizeStockRegulationsTransactions := iniFile.ReadBool('SYNCRONIZE', 'StockRegulationsTransactions', FALSE);
 
 {$IFNDEF RELEASE}
-      AddToLog(Format('DEBUG MODE', []));
+      AddToLog(Format('[INFO] DEBUG MODE', []));
 {$ELSE}
-      AddToLog(Format('RELEASE MODE', []));
+      AddToLog(Format('[INFO] RELEASE MODE', []));
 {$ENDIF}
-      AddToLog(Format('Syncronize financial records: %s', [lSyncroniseFinancialRecords.ToString]));
-      AddToLog(Format('Syncronize Items: %s', [lSyncronizeItem.ToString]));
-      AddToLog(Format('Syncronize csotpriced from BC: %s', [lSyncronizeCostprice.ToString]));
-      AddToLog(Format('Syncronize Sales Transactions: %s', [lSyncronizeSalesTransactions.ToString]));
-      AddToLog(Format('Syncronize Movements Transaction: %s', [lSyncronizeMovementsTransactions.ToString]));
-      AddToLog(Format('Syncronize Stock regulations Transaction: %s', [lSyncronizeStockRegulationsTransactions.ToString]));
+      AddToLog(Format('[INFO] Sync financial records: %s', [lSyncroniseFinancialRecords.ToString]));
+      AddToLog(Format('[INFO] Sync items: %s', [lSyncronizeItem.ToString]));
+      AddToLog(Format('[INFO] Sync costprices from BC: %s', [lSyncronizeCostprice.ToString]));
+      AddToLog(Format('[INFO] Sync sales transactions: %s', [lSyncronizeSalesTransactions.ToString]));
+      AddToLog(Format('[INFO] Sync movements transactions: %s', [lSyncronizeMovementsTransactions.ToString]));
+      AddToLog(Format('[INFO] Sync stock regulations transactions: %s', [lSyncronizeStockRegulationsTransactions.ToString]));
       AddToLog('  ');
 
       if lSyncronizeItem then
@@ -3394,7 +3394,7 @@ begin
 
       if lSyncronizeStockRegulationsTransactions then
       begin
-        AddToLog(Format('Syncronize Stock regulations Transaction: DOES  NOT EXISTS', []));
+        AddToLog('[INFO] Stock regulations transactions: DISABLED');
         // DoSyncronizeStockRegulationTransaction;
       end;
       // AddToLog('  DEBUG - WE DO NOTHING');
@@ -3535,7 +3535,7 @@ begin
     glTimer := 15; // Check every 15 minutes
   end;
   LogFileFolder := iniFile.ReadString('PROGRAM', 'LOGFILEFOLDER', '');
-  AddToLog('EasyPOS Service to synconize data from EasyPOS to BUsiness Central: ' +
+  AddToLog('[INFO] EasyPOS Service to synchronize data from EasyPOS to Business Central: ' +
     IntToStr(PrgVers1) + '.' +
     IntToStr(PrgVers2) + '.' +
     IntToStr(PrgVers3) + '.' +
@@ -3545,22 +3545,22 @@ begin
   if ItIsTimeToRun then
   begin
     Result := TRUE;
-    AddToLog('It is time to run.');
+    AddToLog('[INFO] It is time to run.');
     if glRunEachMinute then
     begin
-      AddToLog(Format('  Run each %s minute(s)', [glRunTime]));
+      AddToLog(Format('[INFO]   Run each %s minute(s)', [glRunTime]));
     end
     else
     begin
       if glRunTimeTo <> '' then
       begin
-        AddToLog(Format('  Time is %s', [FormatDateTime('dd-mm-yyyy hh:mm', glLastRunTime)]));
-        AddToLog(Format('  Should run between %s and %s', [glRunTime, glRunTimeTo]));
+        AddToLog(Format('[INFO]   Time is %s', [FormatDateTime('dd-mm-yyyy hh:mm', glLastRunTime)]));
+        AddToLog(Format('[INFO]   Should run between %s and %s', [glRunTime, glRunTimeTo]));
       end
       else
       begin
-        AddToLog(Format('  Time is %s', [FormatDateTime('dd-mm-yyyy hh:mm', glLastRunTime)]));
-        AddToLog(Format('  Should run at %s', [glRunTime]));
+        AddToLog(Format('[INFO]   Time is %s', [FormatDateTime('dd-mm-yyyy hh:mm', glLastRunTime)]));
+        AddToLog(Format('[INFO]   Should run at %s', [glRunTime]));
       end;
     end;
     AddToLog(' ');
@@ -3570,12 +3570,12 @@ begin
     ForceDirectories(LogFileFolder);
     ForceDirectories(SQLLogFileFolder);
 
-    AddToLog('INI file: ' + iniFile.FileName);
+    AddToLog('[INFO] INI file: ' + iniFile.FileName);
     AddToLog(' ');
 
-    AddToLog('Program timer (i minutter): ' + IntToStr(glTimer));
-    AddToLog('LogFileFolder: ' + LogFileFolder);
-    AddToLog('INI File: ' + ExtractFilePath(ParamStr(0)) + 'Settings.INI');
+    AddToLog('[INFO] Program timer (minutes): ' + IntToStr(glTimer));
+    AddToLog('[INFO] LogFileFolder: ' + LogFileFolder);
+    AddToLog('[INFO] INI File: ' + ExtractFilePath(ParamStr(0)) + 'Settings.INI');
 
     EasyPOS_Database := iniFile.ReadString('PROGRAM', 'DATABASE', '');
     EasyPOS_Database_User := iniFile.ReadString('PROGRAM', 'USER', '');
@@ -3583,24 +3583,24 @@ begin
     EasyPOS_Department := iniFile.ReadString('PROGRAM', 'Department', '');
     EasyPOS_Machine := iniFile.ReadString('PROGRAM', 'Machine', '');
     OnlyTestRoutine := iniFile.ReadBool('PROGRAM', 'TestRoutine', FALSE);
-    AddToLog('Database: ' + EasyPOS_Database);
-    AddToLog('User: xxx');
-    AddToLog('Password: xxx');
-    AddToLog('Department: ' + EasyPOS_Department);
-    AddToLog('Machine: ' + EasyPOS_Machine);
-    AddToLog('Only test: ' + OnlyTestRoutine.ToString(TRUE));
+    AddToLog('[INFO] Database: ' + EasyPOS_Database);
+    AddToLog('[INFO] User: xxx');
+    AddToLog('[INFO] Password: xxx');
+    AddToLog('[INFO] Department: ' + EasyPOS_Department);
+    AddToLog('[INFO] Machine: ' + EasyPOS_Machine);
+    AddToLog('[INFO] Only test: ' + OnlyTestRoutine.ToString(TRUE));
 
     AddToLog(' ');
 
-    AddToLog('Initialize done  ');
+    AddToLog('[INFO] Initialize done');
     AddToLog('  ');
   end
   else
   begin
     Result := FALSE;
-    AddToLog('It is not time to run.');
-    AddToLog(Format('  Last run was %s', [FormatDateTime('dd-mm-yyyy hh:mm', glLastRunTime)]));
-    AddToLog(Format('  Should run at %s', [glRunTime]));
+    AddToLog('[INFO] It is not time to run.');
+    AddToLog(Format('[INFO]   Last run was %s', [FormatDateTime('dd-mm-yyyy hh:mm', glLastRunTime)]));
+    AddToLog(Format('[INFO]   Should run at %s', [glRunTime]));
   end;
 
   tiTimer.Interval := glTimer * 1000 * 60;
