@@ -504,6 +504,30 @@ git submodule update --init --recursive
 2. Build → **Build All**
 3. Output: `Win32\Release\EasyPOS_To_BusinessCentral.exe`
 
+### INI File Editor (`INIFileEditor/`)
+
+Et separat værktøj til at redigere og teste `Settings.INI` konfigurationsfilen.
+
+**Funktioner:**
+
+- ✅ Læs og skriv alle INI-indstillinger via GUI
+- ✅ **Test BC Connection** — tester OAuth2 login, henter companies, og verificerer alle OData endpoints (kmCashstatements, kmItem, kmVariantId, etc.)
+- ✅ **URL Parser** — paste en BC OData URL og få automatisk udtrukket BaseURL, Tenant, Environment og Company
+- ✅ **Test DB Connection** — verificerer Firebird database forbindelse
+- ✅ **Progress feedback** — viser status under test (1/10, 2/10, ...) med UI-locking
+- ✅ **Logging** — skriver detaljeret log til `Editor.log` ved siden af EXE'en
+- ✅ Bruger **submodule-koden** (samme `TBusinessCentral` klasser som hovedservicen)
+
+**Understøttede kunder:**
+- `KAUFMANN` (kind 0) — endpoints med `km`-prefix
+- `NYFORM` (kind 2) — endpoints med `nf`-prefix
+
+**Build:**
+```
+Project: INIFileEditor/EP_To_BC_Editor.dproj
+Output:  INIFileEditor/Win32/Release/EP_To_BC_Editor.exe
+```
+
 ---
 
 ## 🔐 Sikkerhed

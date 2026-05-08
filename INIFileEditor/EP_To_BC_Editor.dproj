@@ -100,8 +100,8 @@
     <VerInfo_Release>401</VerInfo_Release>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-    <VerInfo_Keys>CompanyName=;FileDescription=EP_To_BC_Editor;FileVersion=1.2025.401.24;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.EP_To_BC_Editor;ProductName=EP_To_BC_Editor;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-    <VerInfo_Build>24</VerInfo_Build>
+    <VerInfo_Keys>CompanyName=;FileDescription=EP_To_BC_Editor;FileVersion=1.2025.401.25;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.EP_To_BC_Editor;ProductName=EP_To_BC_Editor;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Build>25</VerInfo_Build>
   </PropertyGroup>
   <ItemGroup>
     <DelphiCompile Include="$(MainSource)">
