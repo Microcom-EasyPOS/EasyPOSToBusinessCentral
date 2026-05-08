@@ -2,7 +2,9 @@ program EP_To_BC_Editor;
 
 uses
   Vcl.Forms,
-  uMain in 'uMain.pas' {frmMain};
+  uMain in 'uMain.pas' {frmMain},
+  uBusinessCentralIntegration in '..\BusinessCentral-Integration\uBusinessCentralIntegration.pas',
+  USelectCompany in '..\BusinessCentral-Integration\USelectCompany.pas' {frmSelectCompany};
 
 {$R *.res}
 

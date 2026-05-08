@@ -55,6 +55,7 @@
     <DCC_F>false</DCC_F>
     <DCC_K>false</DCC_K>
     <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+    <DCC_UnitSearchPath>Z:\EasyPOS\Windows_Service\EasyPOSToBusinessCentral\BusinessCentral-Integration;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
@@ -99,8 +100,8 @@
     <VerInfo_Release>401</VerInfo_Release>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-    <VerInfo_Keys>CompanyName=;FileDescription=EP_To_BC_Editor;FileVersion=1.2025.401.14;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.EP_To_BC_Editor;ProductName=EP_To_BC_Editor;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-    <VerInfo_Build>14</VerInfo_Build>
+    <VerInfo_Keys>CompanyName=;FileDescription=EP_To_BC_Editor;FileVersion=1.2025.401.24;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.EP_To_BC_Editor;ProductName=EP_To_BC_Editor;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Build>24</VerInfo_Build>
   </PropertyGroup>
   <ItemGroup>
     <DelphiCompile Include="$(MainSource)">
@@ -108,6 +109,11 @@
     </DelphiCompile>
     <DCCReference Include="uMain.pas">
       <Form>frmMain</Form>
+      <FormType>dfm</FormType>
+    </DCCReference>
+    <DCCReference Include="..\BusinessCentral-Integration\uBusinessCentralIntegration.pas" />
+    <DCCReference Include="..\BusinessCentral-Integration\USelectCompany.pas">
+      <Form>frmSelectCompany</Form>
       <FormType>dfm</FormType>
     </DCCReference>
     <BuildConfiguration Include="Base">

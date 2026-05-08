@@ -313,6 +313,19 @@ object frmMain: TfrmMain
         TabOrder = 8
         OnClick = btnTestBCClick
       end
+      object lblBCTestStatus: TLabel
+        Left = 236
+        Top = 577
+        Width = 400
+        Height = 15
+        Caption = ''
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNavy
+        Font.Height = -12
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
       object lblBCFullURL: TLabel
         Left = 24
         Top = 620
