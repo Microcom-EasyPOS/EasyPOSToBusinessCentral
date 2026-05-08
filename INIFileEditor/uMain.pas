@@ -330,6 +330,7 @@ var
   lStopwatch: TStopwatch;
   lSuccess: Boolean;
   ResultText: string;
+  lPrefix: string;
   i: Integer;
 begin
   WriteLog('=== BC Connection Test started (via submodule) ===');
@@ -386,6 +387,12 @@ begin
     Exit;
   end;
   WriteLog('  Kind: ' + IntToStr(lKind));
+
+  // Determine endpoint prefix for display
+  if lKind = 0 then
+    lPrefix := 'km'
+  else
+    lPrefix := 'nf';
 
   // Create setup using same class as main service
   // Port 0 or empty means no port
@@ -481,92 +488,92 @@ begin
       WriteLog('  Testing custom API endpoints...');
 
       // CashStatements
-      SetTestStatus('2/10: Testing Cashstatements...');
-      WriteLog('    Testing Cashstatements...');
+      SetTestStatus('2/10: Testing ' + lPrefix + 'Cashstatements...');
+      WriteLog('    Testing ' + lPrefix + 'Cashstatements...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmCashstatements(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('Cashstatements', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'Cashstatements', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // Items
-      SetTestStatus('3/10: Testing Item...');
-      WriteLog('    Testing Item...');
+      SetTestStatus('3/10: Testing ' + lPrefix + 'Item...');
+      WriteLog('    Testing ' + lPrefix + 'Item...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmItems(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('Item', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'Item', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // VariantId
-      SetTestStatus('4/10: Testing VariantId...');
-      WriteLog('    Testing VariantId...');
+      SetTestStatus('4/10: Testing ' + lPrefix + 'VariantId...');
+      WriteLog('    Testing ' + lPrefix + 'VariantId...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmVariantIds(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('VariantId', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'VariantId', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // ItemSales
-      SetTestStatus('5/10: Testing ItemSale...');
-      WriteLog('    Testing ItemSale...');
+      SetTestStatus('5/10: Testing ' + lPrefix + 'ItemSale...');
+      WriteLog('    Testing ' + lPrefix + 'ItemSale...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmItemSales(lBusinessCentralSetup, lResponse, lContent, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('ItemSale', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'ItemSale', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // ItemMoves
-      SetTestStatus('6/10: Testing ItemMove...');
-      WriteLog('    Testing ItemMove...');
+      SetTestStatus('6/10: Testing ' + lPrefix + 'ItemMove...');
+      WriteLog('    Testing ' + lPrefix + 'ItemMove...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmItemMoves(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('ItemMove', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'ItemMove', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // ItemStocks
-      SetTestStatus('7/10: Testing ItemStock...');
-      WriteLog('    Testing ItemStock...');
+      SetTestStatus('7/10: Testing ' + lPrefix + 'ItemStock...');
+      WriteLog('    Testing ' + lPrefix + 'ItemStock...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmItemStocks(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('ItemStock', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'ItemStock', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // ItemAccess
-      SetTestStatus('8/10: Testing ItemAccess...');
-      WriteLog('    Testing ItemAccess...');
+      SetTestStatus('8/10: Testing ' + lPrefix + 'ItemAccess...');
+      WriteLog('    Testing ' + lPrefix + 'ItemAccess...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmItemAccesss(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('ItemAccess', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'ItemAccess', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
-      // CostPrice
-      SetTestStatus('9/10: Testing CostPrice...');
-      WriteLog('    Testing CostPrice...');
+      // CostPrice (always without prefix)
+      SetTestStatus('9/10: Testing costPrice...');
+      WriteLog('    Testing costPrice...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmCostprice(lBusinessCentralSetup, lResponse, lKind, FALSE, lContent);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('CostPrice', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult('costPrice', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
       // Vendors
-      SetTestStatus('10/10: Testing Vendor...');
-      WriteLog('    Testing Vendor...');
+      SetTestStatus('10/10: Testing ' + lPrefix + 'Vendor...');
+      WriteLog('    Testing ' + lPrefix + 'Vendor...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmVendors(lBusinessCentralSetup, lResponse, lKind);
       lStopwatch.Stop;
-      lEndpointResult := TestEndpointResult('Vendor', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+      lEndpointResult := TestEndpointResult(lPrefix + 'Vendor', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
 
