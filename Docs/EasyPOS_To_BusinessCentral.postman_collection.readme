@@ -1,0 +1,90 @@
+EasyPOS To Business Central - Postman Collection
+==================================================
+
+Postman collection til test af alle Business Central OData endpoints
+som EasyPOS Windows Service bruger til synkronisering.
+
+
+IMPORT
+------
+1. Åbn Postman
+2. Klik "Import" (Ctrl+O)
+3. Vælg filen: EasyPOS_To_BusinessCentral.postman_collection.json
+
+
+VARIABLER
+---------
+Efter import, gå til collection settings og udfyld variablerne:
+
+  baseUrl        BC API base URL (default: https://api.businesscentral.dynamics.com/v2.0)
+  tenant         Azure AD Tenant GUID, f.eks. 9b19d0dd-0a6e-4596-82c8-7b58c535d85f
+  environment    BC miljønavn, f.eks. NYF_SB_UAT_20251211
+  company        BC firmanavn, f.eks. Ny Form
+  prefix         Endpoint prefix: nf (Ny Form) eller km (Kaufmann)
+  clientId       OAuth2 Client ID
+  clientSecret   OAuth2 Client Secret (udfyldes manuelt, commit IKKE denne værdi)
+
+Kaufmann bruger Basic Auth - udfyld i stedet:
+  username       Basic Auth brugernavn
+  password       Basic Auth password
+
+
+BRUG
+----
+1. Udfyld variablerne som beskrevet ovenfor
+2. Kør "Auth > Get OAuth2 Token" - dette henter et token og gemmer det
+   automatisk i variablen accessToken via et test-script
+3. Alle øvrige kald bruger dette token automatisk (Bearer auth på collection-niveau)
+4. Når token udløber, kør "Get OAuth2 Token" igen
+
+
+ENDPOINTS
+---------
+Alle OData endpoints bygger URL efter dette mønster:
+
+  {{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}EndpointNavn
+
+Ved at ændre prefix-variablen skifter du mellem km- og nf-endpoints:
+
+  prefix = km  -->  kmCashstatements, kmItem, kmItemSale, ...
+  prefix = nf  -->  nfCashstatements, nfItem, nfItemSale, ...
+
+Undtagelse: costPrice bruger IKKE prefix. Det endpoint hedder altid costPrice
+for begge kunder.
+
+Oversigt over endpoints i collectionen:
+
+  Cashstatements     Kassekladde / finansposter (+ eksempel med $filter)
+  Item               Vare-stamdata
+  VariantId          Vare-varianter
+  ItemSale           Salgstransaktioner
+  ItemMove           Flytnings-transaktioner
+  ItemStock          Lagerregulering (DISABLED i servicen - kun til test)
+  ItemAccess         Item access data
+  CostPrice          Kostpriser (BC --> EasyPOS retning)
+  Vendor             Leverandører
+
+Derudover:
+  Meta > List Companies     Find company-navne i et environment
+  Meta > OData Metadata     Hent OData schema for alle custom endpoints
+
+
+ODATA FILTRE
+------------
+Tilføj $filter som query parameter, f.eks.:
+
+  $filter=transId eq 0
+  $filter=butik eq 'SHOP01'
+  $filter=bogfRingsDato gt '2025-01-01'
+
+Se OData v4 dokumentation for fuld filter-syntax.
+
+
+BEMÆRKNINGER
+------------
+- Token udløber typisk efter 1 time. Kør "Get OAuth2 Token" igen.
+- clientSecret må IKKE committes til Git. Udfyld den kun i Postman.
+- StockRegulations (ItemStock) er PERMANENT DISABLED i servicen.
+  Endpoint eksisterer kun til manuelt test-brug.
+- Kaufmann (km) bruger on-premise BC med Basic Auth.
+  Ny Form (nf) bruger cloud BC med OAuth2.

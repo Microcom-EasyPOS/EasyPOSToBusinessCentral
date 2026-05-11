@@ -1,0 +1,373 @@
+{
+	"info": {
+		"name": "EasyPOS To Business Central",
+		"description": "API collection for EasyPOS ↔ Business Central sync.\n\nSæt variablen `prefix` til `km` (Kaufmann) eller `nf` (Ny Form) for at skifte kunde.\n\n**OAuth2 (ny-form):** Udfyld `clientId` og `clientSecret`, kør \"Get OAuth2 Token\" først.\n**Basic Auth (Kaufmann):** Udfyld `username` og `password`.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.businesscentral.dynamics.com/v2.0",
+			"description": "BC API base URL"
+		},
+		{
+			"key": "tenant",
+			"value": "TENANT-GUID-HER",
+			"description": "Azure AD Tenant GUID"
+		},
+		{
+			"key": "environment",
+			"value": "ENVIRONMENT-NAVN-HER",
+			"description": "BC environment, f.eks. NYF_SB_UAT_20251211"
+		},
+		{
+			"key": "company",
+			"value": "FIRMA-NAVN-HER",
+			"description": "BC Company name, f.eks. Ny Form"
+		},
+		{
+			"key": "prefix",
+			"value": "nf",
+			"description": "Endpoint prefix: km (Kaufmann) eller nf (Ny Form)"
+		},
+		{
+			"key": "clientId",
+			"value": "CLIENT-ID-HER",
+			"description": "OAuth2 Client ID (til ny-form)"
+		},
+		{
+			"key": "clientSecret",
+			"value": "",
+			"description": "OAuth2 Client Secret (til ny-form) - udfyldes manuelt"
+		},
+		{
+			"key": "username",
+			"value": "",
+			"description": "Basic Auth username (til Kaufmann)"
+		},
+		{
+			"key": "password",
+			"value": "",
+			"description": "Basic Auth password (til Kaufmann)"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"description": "OAuth2 access token - sættes automatisk af 'Get OAuth2 Token'"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Authentication endpoints",
+			"item": [
+				{
+					"name": "Get OAuth2 Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.access_token);",
+									"    console.log('Token set successfully. Expires in ' + jsonData.expires_in + ' seconds.');",
+									"} else {",
+									"    console.error('No access_token in response:', jsonData);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials"
+								},
+								{
+									"key": "client_id",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{clientSecret}}"
+								},
+								{
+									"key": "scope",
+									"value": "https://api.businesscentral.dynamics.com/.default"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://login.microsoftonline.com/{{tenant}}/oauth2/v2.0/token",
+							"protocol": "https",
+							"host": ["login", "microsoftonline", "com"],
+							"path": ["{{tenant}}", "oauth2", "v2.0", "token"]
+						},
+						"description": "Henter OAuth2 access token via client credentials flow.\nTokenet gemmes automatisk i variablen `accessToken` og bruges af alle andre kald."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Meta",
+			"description": "Metadata og Company lookup",
+			"item": [
+				{
+					"name": "List Companies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/api/v2.0/companies",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "api", "v2.0", "companies"]
+						},
+						"description": "Henter liste over alle companies i BC environment. Brug til at finde det korrekte company-navn."
+					},
+					"response": []
+				},
+				{
+					"name": "OData Metadata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/$metadata",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "$metadata"]
+						},
+						"description": "Henter OData metadata (schema) for alle custom API endpoints."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cashstatements (Finansposter)",
+			"description": "Kassekladde / finansposter",
+			"item": [
+				{
+					"name": "GET Cashstatements",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}Cashstatements",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}Cashstatements"]
+						},
+						"description": "Henter alle kassekladde-poster (cashstatements) fra Business Central."
+					},
+					"response": []
+				},
+				{
+					"name": "GET Cashstatements (med filter)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}Cashstatements?$filter=transId eq 0",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}Cashstatements"],
+							"query": [
+								{
+									"key": "$filter",
+									"value": "transId eq 0",
+									"description": "OData filter - tilpas efter behov"
+								}
+							]
+						},
+						"description": "Henter cashstatements med OData $filter."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Item (Varer)",
+			"description": "Vare-stamdata",
+			"item": [
+				{
+					"name": "GET Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}Item",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}Item"]
+						},
+						"description": "Henter alle varer fra Business Central."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "VariantId (Varianter)",
+			"description": "Vare-varianter",
+			"item": [
+				{
+					"name": "GET VariantIds",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}VariantId",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}VariantId"]
+						},
+						"description": "Henter alle vare-varianter fra Business Central."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ItemSale (Salgstransaktioner)",
+			"description": "Salgs-transaktioner fra EasyPOS",
+			"item": [
+				{
+					"name": "GET ItemSales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}ItemSale",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}ItemSale"]
+						},
+						"description": "Henter alle salgstransaktioner fra Business Central."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ItemMove (Flytninger)",
+			"description": "Flytnings-transaktioner",
+			"item": [
+				{
+					"name": "GET ItemMoves",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}ItemMove",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}ItemMove"]
+						},
+						"description": "Henter alle flytnings-transaktioner fra Business Central."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ItemStock (Lager)",
+			"description": "Lagerregulering (DISABLED i service)",
+			"item": [
+				{
+					"name": "GET ItemStock",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}ItemStock",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}ItemStock"]
+						},
+						"description": "Henter lagerregulering. OBS: StockRegulations er DISABLED i servicen!"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ItemAccess (Adgangskontrol)",
+			"description": "Item access data",
+			"item": [
+				{
+					"name": "GET ItemAccess",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}ItemAccess",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}ItemAccess"]
+						},
+						"description": "Henter item access data fra Business Central."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CostPrice (Kostpriser)",
+			"description": "Kostpriser - BEMÆRK: bruger IKKE prefix, altid 'costPrice'",
+			"item": [
+				{
+					"name": "GET CostPrices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/costPrice",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "costPrice"]
+						},
+						"description": "Henter kostpriser fra BC. OBS: Denne bruger IKKE prefix-variablen - endpoint hedder altid 'costPrice' for både km og nf."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vendor (Leverandører)",
+			"description": "Leverandør-data",
+			"item": [
+				{
+					"name": "GET Vendors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{tenant}}/{{environment}}/ODataV4/Company('{{company}}')/{{prefix}}Vendor",
+							"host": ["{{baseUrl}}"],
+							"path": ["{{tenant}}", "{{environment}}", "ODataV4", "Company('{{company}}')", "{{prefix}}Vendor"]
+						},
+						"description": "Henter leverandører fra Business Central."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
