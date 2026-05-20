@@ -937,9 +937,10 @@ var
   lSourceFile: string;
   lDestinationFile: string;
 begin
-  lSourceFile := ExtractFilePath(Application.ExeName) + '\' + FiniFileName;
-  lDestinationFile := ExtractFilePath(Application.ExeName) + '\' + TPath.GetFileNameWithoutExtension(FiniFileName) + '.BAK';
-  TFile.Copy(lSourceFile, lDestinationFile, true);
+  lSourceFile := ExtractFilePath(Application.ExeName) + FiniFileName;
+  lDestinationFile := ExtractFilePath(Application.ExeName) + TPath.GetFileNameWithoutExtension(FiniFileName) + '.BAK';
+  if FileExists(lSourceFile) then
+    TFile.Copy(lSourceFile, lDestinationFile, true);
   WriteSettingsFromINIFile;
   FiniFile.Free;
 end;
@@ -954,7 +955,7 @@ procedure TfrmMain.FormShow(Sender: TObject);
 var
   lFileName: string;
 begin
-  lFileName := ExtractFilePath(Application.ExeName) + '\' + FiniFileName;
+  lFileName := ExtractFilePath(Application.ExeName) + FiniFileName;
   if FileExists(lFileName) then
   begin
     FiniFile := TINIFile.Create(lFileName);
