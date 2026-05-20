@@ -963,7 +963,7 @@ begin
   end
   else
   begin
-    ShowMessage('INI fil (settings.ini) ikke fundet.');
+    ShowMessage('INI fil ikke fundet:' + sLineBreak + lFileName);
   end;
 end;
 
