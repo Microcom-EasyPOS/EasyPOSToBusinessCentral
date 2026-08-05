@@ -568,7 +568,7 @@ begin
       FreeAndNil(lResponse);
 
       // Vendors
-      SetTestStatus('10/10: Testing ' + lPrefix + 'Vendor...');
+      SetTestStatus('10/11: Testing ' + lPrefix + 'Vendor...');
       WriteLog('    Testing ' + lPrefix + 'Vendor...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmVendors(lBusinessCentralSetup, lResponse, lKind);
@@ -576,6 +576,19 @@ begin
       lEndpointResult := TestEndpointResult(lPrefix + 'Vendor', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
+
+      // nfItemAdjustment
+      if lKind = 2 then
+      begin
+        SetTestStatus('11/11: Testing nfItemAdjustment...');
+        WriteLog('    Testing nfItemAdjustment...');
+        lStopwatch := TStopwatch.StartNew;
+        lSuccess := lBusinessCentral.GetnfItemAdjustments(lBusinessCentralSetup, lResponse, lKind);
+        lStopwatch.Stop;
+        lEndpointResult := TestEndpointResult('nfItemAdjustment', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+        ResultText := ResultText + lEndpointResult;
+        FreeAndNil(lResponse);
+      end;
 
       ShowMessage(ResultText);
     finally
