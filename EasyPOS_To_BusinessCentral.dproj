@@ -98,8 +98,8 @@
     <VerInfo_Release>1209</VerInfo_Release>
     <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
     <VerInfo_Locale>1033</VerInfo_Locale>
-    <VerInfo_Build>181</VerInfo_Build>
-    <VerInfo_Keys>CompanyName=EasyPOS A/S;FileDescription=EasyPOS_To_BusinessCentral;FileVersion=1.2025.1209.181;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.EasyPOS_To_BusinessCentral;ProductName=EasyPOS_To_BusinessCentral;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Build>182</VerInfo_Build>
+    <VerInfo_Keys>CompanyName=EasyPOS A/S;FileDescription=EasyPOS_To_BusinessCentral;FileVersion=1.2025.1209.182;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.EasyPOS_To_BusinessCentral;ProductName=EasyPOS_To_BusinessCentral;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     <DCC_DebugInformation>2</DCC_DebugInformation>
     <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
     <DCC_MapFile>3</DCC_MapFile>
