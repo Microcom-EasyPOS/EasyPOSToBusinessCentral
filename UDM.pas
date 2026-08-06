@@ -1,4 +1,4 @@
-﻿{$IFDEF RELEASE}
+{$IFDEF RELEASE}
 {$ENDIF}
 {$IFDEF DEBUG}
 {$ENDIF}
@@ -3133,17 +3133,18 @@ var
     end;
 
   begin
-    AddToLog(Format('[INFO]   Checking lagertilgangsnummer eq ''%s'' and leverandRKode eq ''%s'' and butikId eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central', [
-      QFetchStockRegulationsTransactions.FieldByName('Lagertilgangsnummer').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('LeverandorKode').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('ButikID').AsString,
-      FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime)
+    AddToLog(Format('[INFO]   reguleringsId number eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central', [
+      QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
+      QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
+      QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
+      FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime)
       ]));
-    lBusinessCentralSetup.FilterValue := Format('lagertilgangsnummer eq ''%s'' and leverandRKode eq ''%s'' and butikId eq ''%s'' and bogfRingsDato eq ''%s'' ', [
-      QFetchStockRegulationsTransactions.FieldByName('Lagertilgangsnummer').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('LeverandorKode').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('ButikID').AsString,
-      FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime)
+
+    lBusinessCentralSetup.FilterValue := Format('reguleringsId eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s'' ', [
+      QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
+      QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
+      QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
+      FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime)
       ]);
     
     lBusinessCentralSetup.OrderValue := '';
