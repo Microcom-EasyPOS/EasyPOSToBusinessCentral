@@ -831,6 +831,25 @@ object frmMain: TfrmMain
         ReadOnly = True
         TabOrder = 2
       end
+      object btnTestStockRegulations: TButton
+        Left = 32
+        Top = 290
+        Width = 200
+        Height = 30
+        Caption = 'Test BC Endpoint (Top 100)'
+        TabOrder = 3
+        OnClick = btnTestStockRegulationsClick
+      end
+      object memoTestResult: TMemo
+        Left = 32
+        Top = 330
+        Width = 665
+        Height = 250
+        ReadOnly = True
+        ScrollBars = ssBoth
+        TabOrder = 4
+        WordWrap = False
+      end
     end
     object TabSheet10: TTabSheet
       Caption = 'Costprice from Business Central'
