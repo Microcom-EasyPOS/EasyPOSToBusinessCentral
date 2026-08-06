@@ -1,4 +1,4 @@
-{$IFDEF RELEASE}
+﻿{$IFDEF RELEASE}
 {$ENDIF}
 {$IFDEF DEBUG}
 {$ENDIF}
@@ -3066,7 +3066,7 @@ var
     lJSONStr: string;
     DoContinue: Boolean;
     lErrorString: string;
-    lkmItemAccess: TkmItemAccess;
+    lnfItemAdjustment: TnfItemAdjustment;
     DoContinueWithInsert: Boolean;
     lGetResponse: TBusinessCentral_Response;
 
@@ -3149,26 +3149,29 @@ var
     
     lBusinessCentralSetup.OrderValue := '';
     lBusinessCentralSetup.SelectValue := '';
-    DoContinueWithInsert := lBusinessCentral.GetkmItemAccesss(lBusinessCentralSetup, lGetResponse, LF_BC_Version);
+    DoContinueWithInsert := lBusinessCentral.GetnfItemAdjustments(lBusinessCentralSetup, lGetResponse, LF_BC_Version);
 
     if DoContinueWithInsert then
     begin
-      if (lGetResponse as TkmItemAccesss).Value.Count = 0 then
+      if (lGetResponse as TnfItemAdjustments).Value.Count = 0 then
       begin
-        lkmItemAccess := TkmItemAccess.Create;
+        lnfItemAdjustment := TnfItemAdjustment.Create;
         try
-          lkmItemAccess.transId := BC_TransactionID;
-          lkmItemAccess.butikId := QFetchStockRegulationsTransactions.FieldByName('ButikID').AsString;
-          lkmItemAccess.leverandRKode := QFetchStockRegulationsTransactions.FieldByName('LeverandorKode').AsString;
-          lkmItemAccess.lagertilgangsnummer := QFetchStockRegulationsTransactions.FieldByName('Lagertilgangsnummer').AsString;
-          lkmItemAccess.bogfRingsDato := FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime);
-          lkmItemAccess.belB := QFetchStockRegulationsTransactions.FieldByName('Belob').AsFloat;
-          lkmItemAccess.status := '0';
-          lkmItemAccess.tilbagefRt := FALSE;
-          lkmItemAccess.transDato := FormatDateTime('dd-mm-yyyy', NOW);
-          lkmItemAccess.transTid := FormatDateTime('hh:mm:ss', NOW);
+          lnfItemAdjustment.transId := BC_TransactionID;
+          lnfItemAdjustment.reguleringsId := QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString;
+          lnfItemAdjustment.vareId := QFetchStockRegulationsTransactions.FieldByName('VAREFRVSTRNR').AsString;
+          lnfItemAdjustment.variantId := QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString;
+          lnfItemAdjustment.epId := QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsInteger;
+          lnfItemAdjustment.bogfRingsDato := FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime);
+          lnfItemAdjustment.butik := QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString;
+          lnfItemAdjustment.antal := QFetchStockRegulationsTransactions.FieldByName('SALGSTK').AsFloat;
+          lnfItemAdjustment.kostPris := QFetchStockRegulationsTransactions.FieldByName('KOSTPRIS').AsFloat;
+          lnfItemAdjustment.status := QFetchStockRegulationsTransactions.FieldByName('STATUS_').AsString;
+          lnfItemAdjustment.tekst := QFetchStockRegulationsTransactions.FieldByName('BONTEXT').AsString;
+          lnfItemAdjustment.transDato := FormatDateTime('dd-mm-yyyy', NOW);
+          lnfItemAdjustment.transTid := FormatDateTime('hh:mm:ss', NOW);
 
-          lJSONStr := GetDefaultSerializer.SerializeObject(lkmItemAccess);
+          lJSONStr := GetDefaultSerializer.SerializeObject(lnfItemAdjustment);
 
           INC(lNumberOfExportedStockRegulationTransactions);
           AddToLog(Format('[INFO]   Stock regulation transaction record to transfer: %d - %s', [lNumberOfExportedStockRegulationTransactions, lJSONStr]));
@@ -3179,12 +3182,12 @@ var
           end
           else
           begin
-            DoContinue := (lBusinessCentral.PostkmItemAccess(lBusinessCentralSetup, lkmItemAccess, lResponse, LF_BC_Version));
+            DoContinue := (lBusinessCentral.PostnfItemAdjustment(lBusinessCentralSetup, lnfItemAdjustment, lResponse, LF_BC_Version));
           end;
 
           if DoContinue then
           begin
-            iniFile.WriteDateTime('StockRegulation', 'Last run', QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime);
+            iniFile.WriteDateTime('StockRegulation', 'Last run', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime);
             Result := DoMarkStockRegulationTransactionsAsExported;
           end
           else
@@ -3196,7 +3199,7 @@ var
               FLastDateTimeForStatusCode503 := NOW;
               
             lErrorString := 'Unexpected error when inserting stock regulation transaction in BC ' + #13#10 +
-              '  EP Bonnr: ' + QFetchStockRegulationsTransactions.FieldByName('LagerTilgangsNummer').AsString + #13#10 +
+              '  Trans ID: ' + QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString + #13#10 +
               '  Code: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
               '  Message: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
               '  JSON: ' + lJSONStr + #13#10;
@@ -3206,17 +3209,17 @@ var
           end;
           FReeAndNil(lResponse);
         finally
-          FReeAndNil(lkmItemAccess);
+          FReeAndNil(lnfItemAdjustment);
         end;
       end
       else
       begin
         AddToLog(Format
-          ('[INFO]   Already inserted. Skipping lagertilgangsnummer eq ''%s'' and leverandRKode eq ''%s'' and butikId eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central', [
-          QFetchStockRegulationsTransactions.FieldByName('Lagertilgangsnummer').AsString,
-          QFetchStockRegulationsTransactions.FieldByName('LeverandorKode').AsString,
-          QFetchStockRegulationsTransactions.FieldByName('ButikID').AsString,
-          FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime)
+          ('[INFO]   Already inserted. Skipping reguleringsId eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central', [
+          QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
+          QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
+          QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
+          FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime)
           ]));
 
         Result := DoMarkStockRegulationTransactionsAsExported;
@@ -3232,7 +3235,7 @@ var
         FLastDateTimeForStatusCode503 := NOW;
         
       lErrorString := 'Unexpected error when checking stock regulation transaction in BC ' + #13#10 +
-        '  EP ID: ' + QFetchStockRegulationsTransactions.FieldByName('EPID').AsString + #13#10 +
+        '  Trans ID: ' + QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString + #13#10 +
         '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
         '  Message: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusText + #13#10 +
         '  JSON: ' + lJSONStr + #13#10;
