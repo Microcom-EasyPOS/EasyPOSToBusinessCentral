@@ -10,6 +10,7 @@ uses
   System.Classes,
   System.IOUtils,
   System.Diagnostics,
+  System.JSON,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -19,6 +20,7 @@ uses
   Vcl.Buttons,
   Vcl.Mask,
   IniFiles,
+  REST.Types,
   uBusinessCentralIntegration,
   FireDAC.Stan.Intf,
   FireDAC.Stan.Option,
@@ -139,6 +141,8 @@ type
     edStockRegulationTransactionsDays: TEdit;
     edStockRegulationTransactionsLastRun: TEdit;
     edStockRegulationTransactionsLastTry: TEdit;
+    btnTestStockRegulations: TButton;
+    memoTestResult: TMemo;
     lblStockLastTry: TLabel;
     lblStockLastRun: TLabel;
     cbSyncStockRegulations: TCheckBox;
@@ -162,6 +166,7 @@ type
     procedure btnSelectFolderClick(Sender: TObject);
     procedure btnTestDBClick(Sender: TObject);
     procedure btnTestBCClick(Sender: TObject);
+    procedure btnTestStockRegulationsClick(Sender: TObject);
     procedure btnParseURLClick(Sender: TObject);
     procedure tsGeneralLogShow(Sender: TObject);
     procedure lbLogFilesClick(Sender: TObject);
@@ -169,6 +174,7 @@ type
     procedure lbBCLogFilesClick(Sender: TObject);
     procedure TabSheet6Show(Sender: TObject);
     procedure lbFinansLogFilesClick(Sender: TObject);
+
   private
     FiniFile: TIniFile;
     FiniFileName: string;
@@ -568,7 +574,7 @@ begin
       FreeAndNil(lResponse);
 
       // Vendors
-      SetTestStatus('10/10: Testing ' + lPrefix + 'Vendor...');
+      SetTestStatus('10/11: Testing ' + lPrefix + 'Vendor...');
       WriteLog('    Testing ' + lPrefix + 'Vendor...');
       lStopwatch := TStopwatch.StartNew;
       lSuccess := lBusinessCentral.GetkmVendors(lBusinessCentralSetup, lResponse, lKind);
@@ -576,6 +582,19 @@ begin
       lEndpointResult := TestEndpointResult(lPrefix + 'Vendor', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
       ResultText := ResultText + lEndpointResult;
       FreeAndNil(lResponse);
+
+      // nfItemAdjustment
+      if lKind = 2 then
+      begin
+        SetTestStatus('11/11: Testing nfItemAdjustment...');
+        WriteLog('    Testing nfItemAdjustment...');
+        lStopwatch := TStopwatch.StartNew;
+        lSuccess := lBusinessCentral.GetnfItemAdjustments(lBusinessCentralSetup, lResponse, lKind);
+        lStopwatch.Stop;
+        lEndpointResult := TestEndpointResult('nfItemAdjustment', lSuccess, lResponse, lStopwatch.ElapsedMilliseconds);
+        ResultText := ResultText + lEndpointResult;
+        FreeAndNil(lResponse);
+      end;
 
       ShowMessage(ResultText);
     finally
@@ -589,6 +608,129 @@ begin
     lBusinessCentralSetup.Free;
   end;
   WriteLog('=== BC Connection Test ended ===');
+end;
+
+procedure TfrmMain.btnTestStockRegulationsClick(Sender: TObject);
+var
+  lBusinessCentralSetup: TBusinessCentralSetup;
+  lBusinessCentralHTTP: TBusinessCentralHTTP;
+  lKind: Integer;
+  lPort, lBaseURL: string;
+  lStopwatch: TStopwatch;
+  lJSONValue: TJSONValue;
+begin
+  memoTestResult.Clear;
+  memoTestResult.Lines.Add('Starting nfItemAdjustments API test...');
+  memoTestResult.Lines.Add('');
+  Application.ProcessMessages;
+
+  // Validate required fields
+  if Trim(edBCBaseURL.Text) = '' then
+  begin
+    memoTestResult.Lines.Add('ERROR: Base URL is empty');
+    Exit;
+  end;
+  if Trim(edBCUser.Text) = '' then
+  begin
+    memoTestResult.Lines.Add('ERROR: Client ID is empty');
+    Exit;
+  end;
+  if Trim(edBCPassword.Text) = '' then
+  begin
+    memoTestResult.Lines.Add('ERROR: Client Secret is empty');
+    Exit;
+  end;
+  if Trim(edBCCompanyURL.Text) = '' then
+  begin
+    memoTestResult.Lines.Add('ERROR: Tenant ID is empty');
+    Exit;
+  end;
+  if Trim(edEnvironment.Text) = '' then
+  begin
+    memoTestResult.Lines.Add('ERROR: Environment is empty');
+    Exit;
+  end;
+
+  // Determine kind (only NYFORM supports nfItemAdjustments)
+  if UpperCase(Trim(edBusinessCentralKunde.Text)) = 'NYFORM' then
+    lKind := 2
+  else
+  begin
+    memoTestResult.Lines.Add('ERROR: nfItemAdjustments endpoint is only available for NYFORM');
+    memoTestResult.Lines.Add('Current customer: ' + edBusinessCentralKunde.Text);
+    Exit;
+  end;
+
+  // Port handling
+  if (Trim(edBCPOrt.Text) = '') or (Trim(edBCPOrt.Text) = '0') then
+    lPort := ''
+  else
+    lPort := Trim(edBCPOrt.Text);
+
+  // Ensure BaseURL includes /v2.0/
+  lBaseURL := Trim(edBCBaseURL.Text);
+  if not lBaseURL.EndsWith('/') then
+    lBaseURL := lBaseURL + '/';
+  if not lBaseURL.EndsWith('v2.0/') then
+    lBaseURL := lBaseURL + 'v2.0/';
+
+  lBusinessCentralSetup := TBusinessCentralSetup.Create(
+    lBaseURL,
+    lPort,
+    Trim(edBCCompanyURL.Text),
+    Trim(edBCActiveCompany.Text),
+    Trim(edEnvironment.Text),
+    Trim(edBCUser.Text),
+    Trim(edBCPassword.Text),
+    lKind);
+  try
+    memoTestResult.Lines.Add('Endpoint: ' + lBusinessCentralSetup.nfItemAdjustment);
+    memoTestResult.Lines.Add('Order: transDato desc');
+    memoTestResult.Lines.Add('Top: 100');
+    memoTestResult.Lines.Add('');
+    memoTestResult.Lines.Add('Calling API...');
+    Application.ProcessMessages;
+
+    // Create HTTP request directly
+    lBusinessCentralHTTP := TBusinessCentralHTTP.Create(lBusinessCentralSetup, rmGET, FALSE, lKind);
+    try
+      lBusinessCentralHTTP.Request.Resource := lBusinessCentralSetup.nfItemAdjustment;
+      lBusinessCentralHTTP.Request.AddParameter('$orderby', 'transDato desc');
+      lBusinessCentralHTTP.Request.AddParameter('$top', '100');
+
+      Screen.Cursor := crHourGlass;
+      try
+        lStopwatch := TStopwatch.StartNew;
+        lBusinessCentralHTTP.Request.Execute;
+        lStopwatch.Stop;
+      finally
+        Screen.Cursor := crDefault;
+      end;
+
+      memoTestResult.Lines.Add('');
+      memoTestResult.Lines.Add('=== RESULT ===');
+      memoTestResult.Lines.Add('Duration: ' + IntToStr(lStopwatch.ElapsedMilliseconds) + ' ms');
+      memoTestResult.Lines.Add('Status Code: ' + IntToStr(lBusinessCentralHTTP.Response.StatusCode));
+      memoTestResult.Lines.Add('Status Text: ' + lBusinessCentralHTTP.Response.StatusText);
+      memoTestResult.Lines.Add('');
+      memoTestResult.Lines.Add('=== RAW JSON RESPONSE ===');
+      lJSONValue := TJSONObject.ParseJSONValue(lBusinessCentralHTTP.Response.Content);
+      if Assigned(lJSONValue) then
+      begin
+        try
+          memoTestResult.Lines.Add(lJSONValue.Format(2));
+        finally
+          lJSONValue.Free;
+        end;
+      end
+      else
+        memoTestResult.Lines.Add(lBusinessCentralHTTP.Response.Content);
+    finally
+      lBusinessCentralHTTP.Free;
+    end;
+  finally
+    lBusinessCentralSetup.Free;
+  end;
 end;
 
 procedure TfrmMain.btnParseURLClick(Sender: TObject);
@@ -981,5 +1123,6 @@ procedure TfrmMain.lbLogFilesClick(Sender: TObject);
 begin
   mmoLog.Lines.LoadFromFile(edLogFolder.Text + lbLogFiles.Items[lbLogFiles.ItemIndex]);
 end;
+
 
 end.

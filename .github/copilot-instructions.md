@@ -74,7 +74,7 @@ EasyPOS (Firebird DB) ──→ Windows Service ──→ Business Central (REST
 3. **Movements Transactions** (EP → BC) — triggered by `EKSPORTERET = 0`
 4. **Financial Records** (EP → BC) — triggered by `BEHANDLET = 0`
 5. **Cost Prices** (BC → EP) — reads from BC, updates EasyPOS prices
-6. ~~Stock Regulations~~ — **PERMANENTLY DISABLED.** Do not reactivate.
+6. **Stock Regulations** (EP → BC) — triggered by `EKSPORTERET = 0` (ART = 11). Syncs to `nfItemAdjustments`.
 
 ### Customer Versions
 
@@ -106,7 +106,6 @@ Runtime configuration is via `Settings.INI` (same folder as EXE). Key sections: 
 
 - **Never log passwords** — use `****` masking (see `Docs/SECURITY_FIXES.md`)
 - **HTTP 503 handling:** When BC returns 503, the service pauses API calls (tracked via `LastDateTimeForStatusCode503`)
-- **`StockRegulationsTransactions` must stay disabled** (`=0` in INI). The code is commented out intentionally.
 
 ### Submodule Workflow
 
@@ -119,6 +118,5 @@ The `BusinessCentral-Integration/` submodule has its own Git history. When modif
 
 Technical sync documentation lives in `Docs/`:
 - `TECH_Sync_*.md` — Detailed technical docs per sync module
-- `Docs/Internal/` — Deep-dive analysis documents
 - `CHANGELOG.md` — Version history
 - `SECURITY_FIXES.md` — Security-related changes
