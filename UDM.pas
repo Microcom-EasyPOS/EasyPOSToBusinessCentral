@@ -3213,8 +3213,8 @@ var
           QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
           QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
           QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
-          FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime,
-          QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString,)
+          FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime),
+          QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString
           ]));
 
         Result := DoMarkStockRegulationTransactionsAsExported;

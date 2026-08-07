@@ -375,6 +375,7 @@ object DM: TDM
     Connection = dbMain
     Transaction = tnMain
     SQL.Strings = (
+      '/*Ordinary stock regulations*/'
       'SELECT'
       '    T.EKSPORTERET,'
       '    T.EXT_TRANS_ID,'
@@ -396,13 +397,51 @@ object DM: TDM
       '          AND T.LAENGDE_NAVN = V.LAENGDE_NAVN'
       'WHERE'
       '    T.DATO >= :PFROMDATE'
-      '    AND T.ART = 11'
+      '    AND T.ART = 11 /*Stock regulations type*/'
       '    AND T.DATO <= :PTODATE'
-      '    AND T.EXT_TRANS_ID = 0'
+      
+        '    AND T.EXT_TRANS_ID = 0 /*If regulation was made via Rest API' +
+        ' this  field have the value 99999*/'
+      '    AND T.BONTEXT <> '#39'Kassation / Reklamation'#39
       '    AND (T.EKSPORTERET = 0 OR T.EKSPORTERET IS NULL)'
+      ''
       ''
       'UNION'
       ''
+      '/*RMA Cases*/'
+      'SELECT'
+      '    T.EKSPORTERET,'
+      '    T.EXT_TRANS_ID,'
+      '    T.BONNR,'
+      '    T.VAREFRVSTRNR,'
+      '    V.V509INDEX,'
+      '    T.TRANSID,'
+      '    T.DATO,'
+      '    T.AFDELING_ID,'
+      '    T.SALGSTK,'
+      '    T.KOSTPR / T.SALGSTK AS KOSTPRIS,'
+      '    '#39'Reklamation'#39' AS STATUS_,'
+      '    T.BONTEXT'
+      'FROM TRANSAKTIONER T'
+      '    INNER JOIN VAREFRVSTR V ON'
+      '          T.VAREFRVSTRNR = V.VAREPLU_ID'
+      '          AND T.FARVE_NAVN = V.FARVE_NAVN'
+      '          AND T.STOERRELSE_NAVN = V.STOERRELSE_NAVN'
+      '          AND T.LAENGDE_NAVN = V.LAENGDE_NAVN'
+      'WHERE'
+      '    T.DATO >= :PFROMDATE'
+      '    AND T.ART = 11 /*Stock regulations type*/'
+      '    AND T.DATO <= :PTODATE'
+      
+        '    AND T.EXT_TRANS_ID = 0 /*If regulation was made via Rest API' +
+        ' this  field have the value 99999*/'
+      '    AND T.BONTEXT = '#39'Kassation / Reklamation'#39
+      '    AND (T.EKSPORTERET = 0 OR T.EKSPORTERET IS NULL)'
+      ''
+      ''
+      'UNION'
+      ''
+      '/*Inventory*/'
       'SELECT'
       '    T.EKSPORTERET,'
       '    T.EXT_TRANS_ID,'
@@ -432,7 +471,7 @@ object DM: TDM
       ''
       ''
       'ORDER BY'
-      '    6   ')
+      '    6    ')
     Left = 568
     Top = 360
     ParamData = <
