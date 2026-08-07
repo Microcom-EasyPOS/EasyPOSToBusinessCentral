@@ -3074,7 +3074,7 @@ var
     begin
       if NOT OnlyTestRoutine then
       begin
-{$IFDEF RELEASE}
+//{$IFDEF RELEASE}
         try
           if NOT trSetEksportedValueOnStockTrans.Active then
           begin
@@ -3085,17 +3085,18 @@ var
           QSetEksportedValueOnStockTrans.SQL.Add('Update Transaktioner t set');
           QSetEksportedValueOnStockTrans.SQL.Add('  t.Eksporteret = :PEksporteret');
           QSetEksportedValueOnStockTrans.SQL.Add('Where');
-          QSetEksportedValueOnStockTrans.SQL.Add('  t.art=11 AND');
-          QSetEksportedValueOnStockTrans.SQL.Add('  t.bonnr = :PBOnNr AND');
-          QSetEksportedValueOnStockTrans.SQL.Add('  t.dato = :PDato AND');
-          QSetEksportedValueOnStockTrans.SQL.Add('  t.levnavn = :PLevNavn AND');
-          QSetEksportedValueOnStockTrans.SQL.Add('  t.afdeling_id = :PAfdeling_ID AND');
+          QSetEksportedValueOnStockTrans.SQL.Add('  t.art IN (11,12) AND');
+//          QSetEksportedValueOnStockTrans.SQL.Add('  t.bonnr = :PBOnNr AND');
+//          QSetEksportedValueOnStockTrans.SQL.Add('  t.dato = :PDato AND');
+//          QSetEksportedValueOnStockTrans.SQL.Add('  t.levnavn = :PLevNavn AND');
+          QSetEksportedValueOnStockTrans.SQL.Add('  t.TransID = :PTransID AND');
+//          QSetEksportedValueOnStockTrans.SQL.Add('  t.afdeling_id = :PAfdeling_ID AND');
           QSetEksportedValueOnStockTrans.SQL.Add('  (t.EKSPORTERET>=0 or t.EKSPORTERET IS null)');
           QSetEksportedValueOnStockTrans.ParamByName('PEksporteret').AsInteger := QFetchStockRegulationsTransactions.FieldByName('Eksporteret').AsInteger + 1;
-          QSetEksportedValueOnStockTrans.ParamByName('PBOnNr').AsInteger := QFetchStockRegulationsTransactions.FieldByName('Lagertilgangsnummer').AsInteger;
-          QSetEksportedValueOnStockTrans.ParamByName('PDato').AsDateTime := QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime;
-          QSetEksportedValueOnStockTrans.ParamByName('PLevNavn').AsString := QFetchStockRegulationsTransactions.FieldByName('LeverandorNavn').AsString;
-          QSetEksportedValueOnStockTrans.ParamByName('PAfdeling_ID').AsString := QFetchStockRegulationsTransactions.FieldByName('ButikID').AsString;
+          QSetEksportedValueOnStockTrans.ParamByName('PTransID').AsInteger := QFetchStockRegulationsTransactions.FieldByName('TransID').AsInteger;
+//          QSetEksportedValueOnStockTrans.ParamByName('PDato').AsDateTime := QFetchStockRegulationsTransactions.FieldByName('BOGFORINGSDATO').AsDateTime;
+//          QSetEksportedValueOnStockTrans.ParamByName('PLevNavn').AsString := QFetchStockRegulationsTransactions.FieldByName('LeverandorNavn').AsString;
+//          QSetEksportedValueOnStockTrans.ParamByName('PAfdeling_ID').AsString := QFetchStockRegulationsTransactions.FieldByName('ButikID').AsString;
           QSetEksportedValueOnStockTrans.ExecSQL;
           if trSetEksportedValueOnStockTrans.Active then
           begin
@@ -3121,10 +3122,10 @@ var
             WriteEventLog(lErrorString, '', 'EasyPOS Windows Service to sync. with Business Central', EVENTLOG_ERROR_TYPE, 3401, 1);
           end;
         end;
-{$ENDIF}
-{$IFDEF DEBUG}
-        Result := TRUE;
-{$ENDIF}
+//{$ENDIF}
+//{$IFDEF DEBUG}
+//        Result := TRUE;
+//{$ENDIF}
       end
       else
       begin
@@ -3133,20 +3134,13 @@ var
     end;
 
   begin
-    AddToLog(Format('[INFO]   reguleringsId number eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central', [
-      QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
-      FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime)
+    AddToLog(Format('[INFO]   epId eq %s ', [
+      QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString
       ]));
 
-    lBusinessCentralSetup.FilterValue := Format('reguleringsId eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s'' ', [
-      QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
-      QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
-      FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime)
-      ]);
-    
+    lBusinessCentralSetup.FilterValue := Format('epId eq %s ', [
+      QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString]);
+
     lBusinessCentralSetup.OrderValue := '';
     lBusinessCentralSetup.SelectValue := '';
     DoContinueWithInsert := lBusinessCentral.GetnfItemAdjustments(lBusinessCentralSetup, lGetResponse, LF_BC_Version);
@@ -3193,11 +3187,11 @@ var
           else
           begin
             Result := FALSE;
-            
+
             FLastStatusCode := (lResponse as TBusinessCentral_ErrorResponse).StatusCode;
             if ((lResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
               FLastDateTimeForStatusCode503 := NOW;
-              
+
             lErrorString := 'Unexpected error when inserting stock regulation transaction in BC ' + #13#10 +
               '  Trans ID: ' + QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString + #13#10 +
               '  Code: ' + (lResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
@@ -3215,11 +3209,12 @@ var
       else
       begin
         AddToLog(Format
-          ('[INFO]   Already inserted. Skipping reguleringsId eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s'' in Business Central', [
+          ('[INFO]   Already inserted. Skipping reguleringsId eq ''%s'' and variantId eq ''%s'' and butik eq ''%s'' and bogfRingsDato eq ''%s''  and epID (TransID) eq ''%s'' in Business Central', [
           QFetchStockRegulationsTransactions.FieldByName('BONNR').AsString,
           QFetchStockRegulationsTransactions.FieldByName('V509INDEX').AsString,
           QFetchStockRegulationsTransactions.FieldByName('AFDELING_ID').AsString,
-          FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime)
+          FormatDateTime('dd-mm-yyyy', QFetchStockRegulationsTransactions.FieldByName('DATO').AsDateTime,
+          QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString,)
           ]));
 
         Result := DoMarkStockRegulationTransactionsAsExported;
@@ -3229,11 +3224,11 @@ var
     begin
       // Do not continue. Some error from BC when trying to get a record
       Result := FALSE;
-      
+
       FLastStatusCode := (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode;
       if ((lGetResponse as TBusinessCentral_ErrorResponse).StatusCode = 503) then
         FLastDateTimeForStatusCode503 := NOW;
-        
+
       lErrorString := 'Unexpected error when checking stock regulation transaction in BC ' + #13#10 +
         '  Trans ID: ' + QFetchStockRegulationsTransactions.FieldByName('TRANSID').AsString + #13#10 +
         '  Code: ' + (lGetResponse as TBusinessCentral_ErrorResponse).StatusCode.ToString + #13#10 +
