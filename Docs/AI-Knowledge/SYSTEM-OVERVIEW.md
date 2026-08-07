@@ -42,7 +42,7 @@ EasyPOS (Firebird) --> Windows Service --> Business Central (REST/OData)
 3. **Movements Transactions** (EP->BC) - trigger: `EKSPORTERET = 0`
 4. **Financial Records** (EP->BC) - trigger: `BEHANDLET = 0`
 5. **Cost Prices** (BC->EP) - laeser fra BC, opdaterer EasyPOS priser
-6. ~~Stock Regulations~~ - **PERMANENT DISABLED** - maa ikke genaktiveres
+6. **Stock Regulations** (EP->BC) - trigger: `EKSPORTERET = 0` (ART = 11). Overfører lagerreguleringer til `nfItemAdjustments`.
 
 ### Build Konfigurationer
 
@@ -67,9 +67,8 @@ Via `LF_BC_Version` i Settings.INI:
 
 1. **Log aldrig passwords** - brug `****` maskering
 2. **HTTP 503:** Pause API kald naar BC returnerer 503 (tracked via `LastDateTimeForStatusCode503`)
-3. **StockRegulations SKAL forblive disabled** (`=0` i INI)
-4. **Transaction IDs:** Hver sync-batch faar unikt `TransID` via stored procedure
-5. **Status tracking:** Records markeres efter eksport (`EKSPORTERET=1` / `BEHANDLET=1`)
+3. **Transaction IDs:** Hver sync-batch faar unikt `TransID` via stored procedure
+4. **Status tracking:** Records markeres efter eksport (`EKSPORTERET=1` / `BEHANDLET=1`)
 
 ## Konfiguration
 

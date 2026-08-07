@@ -10,17 +10,16 @@ Dette dokument giver et overblik over alle synkroniseringsmetoder i systemet.
 
 | # | Navn | Retning | Endpoint | INI Key | Dokument |
 |---|---|---|---|---|---|
-| 1 | Varer | EP → BC | kmItem | Items | [Internal/Sync_1_Items.md](Internal/Sync_1_Items.md) |
-| 2 | Salgstransaktioner | EP → BC | kmItemSale | SalesTransactions | [Internal/Sync_2_Sales.md](Internal/Sync_2_Sales.md) |
-| 3 | Flytningstransaktioner | EP → BC | kmItemMove | MovementsTransactions | [Internal/Sync_3_Movements.md](Internal/Sync_3_Movements.md) |
-| 4 | Finansposter | EP → BC | kmCashstatement | FinancialRecords | [Internal/Sync_4_Financial.md](Internal/Sync_4_Financial.md) |
-| 5 | **Kostpriser** | **BC → EP** | kmCostprice | Costprice from BC | [Internal/Sync_5_Costprice_From_BC.md](Internal/Sync_5_Costprice_From_BC.md) |
+| 1 | Varer | EP → BC | kmItem | Items | [TECH_Sync_Items.md](TECH_Sync_Items.md) |
+| 2 | Salgstransaktioner | EP → BC | kmItemSale | SalesTransactions | [TECH_Sync_Sales.md](TECH_Sync_Sales.md) |
+| 3 | Flytningstransaktioner | EP → BC | kmItemMove | MovementsTransactions | [TECH_Sync_Movements.md](TECH_Sync_Movements.md) |
+| 4 | Finansposter | EP → BC | kmCashstatement | FinancialRecords | [TECH_Sync_Financial.md](TECH_Sync_Financial.md) |
+| 5 | **Kostpriser** | **BC → EP** | kmCostprice | Costprice from BC | [TECH_Sync_Costprice.md](TECH_Sync_Costprice.md) |
+| 6 | Lagerreguleringer | EP → BC | nfItemAdjustments | StockRegulationsTransactions | [TECH_Sync_StockRegulations.md](TECH_Sync_StockRegulations.md) |
 
 ## Deaktiverede Synkroniseringer
 
-| # | Navn | Status | Dokument |
-|---|---|---|---|
-| 6 | Lagerreguleringer | ❌ Udkommenteret | [Internal/Sync_6_StockRegulations_DISABLED.md](Internal/Sync_6_StockRegulations_DISABLED.md) |
+*Ingen aktuelt deaktiverede synkroniseringer.*
 
 ---
 
@@ -45,7 +44,7 @@ DoHandleEksportToBusinessCentral()
 │ 3. DoSyncronizeFinansCialRecords       │  → Finansposter
 │ 4. DoSyncronizeSalesTransactions       │  → Salgstransaktioner
 │ 5. DoSyncronizeMovemmentsTransaction   │  → Flytningstransaktioner
-│ 6. (DoSyncronizeStockRegulation)       │  → DEAKTIVERET
+│ 6. DoSyncronizeStockRegulation         │  → Lagerreguleringer
 └─────────────────────────────────────────┘
     ↓
 DoClearFolder() - Ryd gamle logs
@@ -160,6 +159,9 @@ EasyPOS Database (Firebird)
     │  ┌──────────────────┐  │
     │  │ 5. Flytninger    │──┼──→ BC: kmItemMove
     │  └──────────────────┘  │
+    │  ┌──────────────────┐  │
+    │  │ 6. Reguleringer  │──┼──→ BC: nfItemAdjustments
+    │  └──────────────────┘  │
     └────────────────────────┘
          ↓
     Log filer / Email
@@ -199,7 +201,7 @@ Items=1
 Costprice from BC=1
 SalesTransactions=1
 MovementsTransactions=1
-StockRegulationsTransactions=0  ; SKAL være 0!
+StockRegulationsTransactions=1  ; Aktiv
 
 [Items]
 Last run=45000.5

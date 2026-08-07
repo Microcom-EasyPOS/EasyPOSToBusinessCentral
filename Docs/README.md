@@ -29,21 +29,16 @@ Denne mappe indeholder brugervenlig dokumentation for EasyPOS-BC integrationspro
 
 | # | Dokument | Modul | Retning | Status |
 |---|---|---|---|---|
-| 1 | [Internal/Sync_1_Items.md](Internal/Sync_1_Items.md) | Varer | EP → BC | ✅ Aktiv |
-| 2 | [Internal/Sync_2_Sales.md](Internal/Sync_2_Sales.md) | Salgstransaktioner | EP → BC | ✅ Aktiv |
-| 3 | [Internal/Sync_3_Movements.md](Internal/Sync_3_Movements.md) | Flytningstransaktioner | EP → BC | ✅ Aktiv |
-| 4 | [Internal/Sync_4_Financial.md](Internal/Sync_4_Financial.md) | Finansposter | EP → BC | ✅ Aktiv |
-| 5 | [Internal/Sync_5_Costprice_From_BC.md](Internal/Sync_5_Costprice_From_BC.md) | Kostpriser | **BC → EP** | ✅ Aktiv |
-| 6 | [Internal/Sync_6_StockRegulations_DISABLED.md](Internal/Sync_6_StockRegulations_DISABLED.md) | Lagerreguleringer | EP → BC | ❌ Deaktiveret |
+| 1 | [TECH_Sync_Items.md](TECH_Sync_Items.md) | Varer | EP → BC | ✅ Aktiv |
+| 2 | [TECH_Sync_Sales.md](TECH_Sync_Sales.md) | Salgstransaktioner | EP → BC | ✅ Aktiv |
+| 3 | [TECH_Sync_Movements.md](TECH_Sync_Movements.md) | Flytningstransaktioner | EP → BC | ✅ Aktiv |
+| 4 | [TECH_Sync_Financial.md](TECH_Sync_Financial.md) | Finansposter | EP → BC | ✅ Aktiv |
+| 5 | [TECH_Sync_Costprice.md](TECH_Sync_Costprice.md) | Kostpriser | **BC → EP** | ✅ Aktiv |
+| 6 | [TECH_Sync_StockRegulations.md](TECH_Sync_StockRegulations.md) | Lagerreguleringer | EP → BC | ✅ Aktiv |
 
 ### BC_UPDATEDATE Analyser (Database & Triggers)
 
-| Dokument | Beskrivelse |
-|---|---|
-| [Internal/BC_UPDATEDATE_Complete_Analysis.md](Internal/BC_UPDATEDATE_Complete_Analysis.md) | Komplet database analyse med alle triggers |
-| [Internal/BC_UPDATEDATE_EasyPOSKontor_Analysis.md](Internal/BC_UPDATEDATE_EasyPOSKontor_Analysis.md) | Installation og tekniske detaljer |
-| [Internal/BC_UPDATEDATE_EasyPOSSalg_Search.md](Internal/BC_UPDATEDATE_EasyPOSSalg_Search.md) | Søgningsresultater i Salg projekt |
-| [Internal/BC_UPDATEDATE_Analysis.md](Internal/BC_UPDATEDATE_Analysis.md) | Initial database felt analyse |
+*Tidligere analyse-filer er arkiveret/slettet.*
 
 ---
 
@@ -73,7 +68,7 @@ Denne mappe indeholder brugervenlig dokumentation for EasyPOS-BC integrationspro
    - Kørselsrækkefølge
    - Fælles mønstre
 
-2. **Tekniske detaljer:** [Internal/](Internal/) mappen
+2. **Tekniske detaljer:** TECH_Sync_*.md filerne
    - SQL queries
    - Data mapping
    - API calls
@@ -239,9 +234,7 @@ Se [Sync_5_Costprice_From_BC.md](Sync_5_Costprice_From_BC.md#risici-og-advarsler
 
 ### Lagerreguleringer
 
-**DEAKTIVERET:** Må ikke aktiveres uden grundig analyse!
-
-Se [Sync_6_StockRegulations_DISABLED.md](Sync_6_StockRegulations_DISABLED.md) for årsager.
+**AKTIVERET:** Modulet synkroniserer nu lagerreguleringer til `nfItemAdjustments`.
 
 ### Passwords i INI
 
